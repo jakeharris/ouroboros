@@ -199,7 +199,7 @@ this.growSnake = function () {
         
         var block,
             i,
-            snakeBlocks = entities[0].blocks;
+            snakeBlocks = this.entities[0].blocks;
         
         i = snakeBlocks.length - 1;
         
