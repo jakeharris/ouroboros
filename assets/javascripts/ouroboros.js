@@ -27,7 +27,7 @@ var clear = function () {
           BLOCK_WIDTH = Math.floor(vpwidth() / 60);
           BLOCK_HEIGHT = BLOCK_WIDTH;
         }
-        ctx.fillStyle = '#fafafa';
+        ctx.fillStyle = '#fff';
         ctx.beginPath();
         ctx.rect(0, 0, width, height);
         ctx.closePath();
@@ -56,6 +56,7 @@ var loop = function () {
         clear();
         render();
         logic();
+  
         game = setTimeout(loop, 10);
     };
 
@@ -82,19 +83,5 @@ var pause = function () {
           paused = false;
         }
 }
-
-document.addEventListener('keydown', function (e) {
-  var d = scenes[cur].entities[0].direction,
-      key = e.which;
-  
-  if      (key == '37' && d != Direction.RIGHT) d = Direction.LEFT;
-  else if (key == '38' && d != Direction.DOWN)  d = Direction.UP;
-  else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
-  else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
-  else if (key == '27' || key == '80') pause();
-  
-  inputs.push(d);
-  console.log('inputs[0]: ' + inputs[0]);
-});
 
 loop();

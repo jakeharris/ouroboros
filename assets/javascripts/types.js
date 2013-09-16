@@ -125,7 +125,7 @@ function Menu (items, opts) {
     if(e.type === "MenuItem") {
       e.x += BLOCK_WIDTH;         //to make room for the cursor
       e.y += (i-1)*this.spacing;  //since item 0 of a menu is always the cursor object
-    }
+    } else e.y -= BLOCK_HEIGHT;
   }, this);
   
   this.render = function () {
@@ -133,12 +133,49 @@ function Menu (items, opts) {
       e.render();
     });
   }
+  this.move = function () {
+    items.forEach(function (e, i, a) {
+      e.move();
+    });
+  }
 }
 
 function Cursor (opts) {
- this.render = function () {
-   
- };
+  this.x = (opts.x) ? opts.x : (vpwidth() / 2);
+  this.y = (opts.y) ? opts.y : (vpheight() / 2);
+  this.w = (opts.w) ? opts.w : BLOCK_WIDTH;
+  this.h = (opts.h) ? opts.h : BLOCK_HEIGHT;
+  
+  this.fillStyle = (opts.fillStyle) ? opts.fillStyle : "#282828";
+  
+  this.move = function () {
+    var d;
+    if(inputs.length > 0)
+      d = inputs.pop();
+    if(d){
+      switch(d){
+        case Direction.UP:
+          this.y -= 2*BLOCK_HEIGHT;
+          break;
+        case Direction.DOWN:
+          this.y += 2*BLOCK_HEIGHT;
+          break;
+        case Direction.LEFT:
+        case Direction.RIGHT:
+        default:
+          break;
+      }
+    }
+      
+    
+  };
+  
+  this.render = function () {
+    ctx.beginPath();
+    ctx.fillStyle = this.fillStyle;
+    ctx.fillRect(this.x, this.y, this.w, this.h);
+    ctx.closePath();
+  };
 }
 
 function Text (opts) {
@@ -149,7 +186,7 @@ function Text (opts) {
   this.y = (opts.y) ? opts.y : ((vpheight() / 2) - 200);
   
   this.fontFamily = "MS Shell DLG, Arial, fantasy";
-  this.color = (opts.color) ? opts.color : "#282828";
+  this.fillStyle = (opts.fillStyle) ? opts.fillStyle : "#282828";
   switch(this.type){
     case "Title":
       this.fontSize = "32pt";
@@ -167,7 +204,7 @@ function Text (opts) {
   this.render = function () {
     ctx.beginPath();
     ctx.font = this.fontSize + " " + this.fontFamily;
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = this.fillStyle;
     ctx.fillText(this.text, this.x, this.y);
     ctx.closePath();
   }

@@ -32,7 +32,17 @@ function StartScene (opts) {
                           ];
           return;
         }
+        return this.move();
       };
+  
+  this.move = (opts.move) ? opts.move : function () {
+    if(!this.entities) return;
+    
+    this.entities.forEach(function (e, i, a) {
+      e.move();
+    });
+  };
+  
   this.render = (opts.render) ? opts.render : function () {
     if(!this.entities) return;
     
@@ -40,6 +50,21 @@ function StartScene (opts) {
       e.render();
     });
   }
+  document.addEventListener('keydown', function (e) {
+    var d = scenes[cur].entities[0].direction,
+        key = e.which;
+    
+    if      (key == '37' && d != Direction.RIGHT) d = Direction.LEFT;
+    else if (key == '38' && d != Direction.DOWN)  d = Direction.UP;
+    else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
+    else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
+    else if (key == '13') {
+      cur++;
+      document.removeEventListener('keydown');
+    }
+    
+    inputs.push(d);
+  });
 }
 
 
@@ -204,6 +229,21 @@ this.growSnake = function () {
         snakeBlocks.push(block);
         this.entities[0].blocks = snakeBlocks;
       };
+  this.inputEvents = function(e) {
+    var d = scenes[cur].entities[0].direction,
+        key = e.which;
+    
+    if      (key == '37' && d != Direction.RIGHT) d = Direction.LEFT;
+    else if (key == '38' && d != Direction.DOWN)  d = Direction.UP;
+    else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
+    else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
+    else if (key == '27' || key == '80') pause();
+    
+    inputs.push(d);
+    console.log('inputs[0]: ' + inputs[0]);
+  };
+  document.addEventListener('keydown', this.inputEvents(e));
+  });
 }
 
   
