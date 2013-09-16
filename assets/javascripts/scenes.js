@@ -242,8 +242,7 @@ this.growSnake = function () {
     inputs.push(d);
     console.log('inputs[0]: ' + inputs[0]);
   };
-  document.addEventListener('keydown', this.inputEvents(e));
-  });
+  //document.addEventListener('keydown', this.inputEvents());
 }
 
   
