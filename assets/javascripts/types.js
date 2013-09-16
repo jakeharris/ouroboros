@@ -80,8 +80,8 @@ function Snake (opts, blockopts) {
         for(var x = 0; x < this.speed; x++) {
           this.tail = this.blocks.pop();
           this.tail.x = this.blocks[0].x; this.tail.y = this.blocks[0].y; this.tail.direction = this.blocks[0].direction;
-          if(inputs.length != 0)
-            this.tail.direction = inputs.pop();
+          if(inputs.length > 0)
+            this.direction = inputs.pop();
           this.preventOuroboros();
           this.tail.move();
           this.blocks.unshift(this.tail)

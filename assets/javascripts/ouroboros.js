@@ -94,6 +94,7 @@ document.addEventListener('keydown', function (e) {
   else if (key == '27' || key == '80') pause();
   
   inputs.push(d);
+  console.log('inputs[0]: ' + inputs[0]);
 });
 
 loop();
