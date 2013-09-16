@@ -5,6 +5,61 @@
    The different sections of the game.
  
  */
+
+function StartScene (opts) {
+  this.name = "Start Menu";
+  this.entities = (opts.entities) ? opts.entities : [  
+                                                      new Text({ type: 'Title', text: 'OUROBOROS' }), 
+                                                      new Menu([
+                                                                new Cursor({ }),
+                                                                new Text({ type: 'MenuItem', text: 'New Game' }),
+                                                                new Text({ type: 'MenuItem', text: 'Continue' }),
+                                                                new Text({ type: 'MenuItem', text: 'Arcade Mode' })
+                                                               ], 
+                                                              { }
+                                                              )
+                                                    ];
+  this.logic = (opts.logic) ? opts.logic : function () {
+        if(!this.entities) {
+          this.entities = [ 
+                            new Text({ type: 'Title', text: 'OUROBOROS' }), 
+                            new Menu([
+                              new Cursor({ }),
+                              new Text({ type: 'MenuItem', text: 'New Game' }),
+                              new Text({ type: 'MenuItem', text: 'Continue' }),
+                              new Text({ type: 'MenuItem', text: 'Arcade Mode' })
+                            ], { })
+                          ];
+          return;
+        }
+      };
+  this.render = (opts.render) ? opts.render : function () {
+    if(!this.entities) return;
+    
+    this.entities.forEach(function (e, i, a) {
+      e.render();
+    });
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function SnakeScene (opts) {
   this.name = "Snake";
   this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }, { }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];

@@ -110,3 +110,65 @@ function Snake (opts, blockopts) {
   while(this.blocks.length < size) this.blocks.push (new Block( { x: this.blocks[this.blocks.length - 1].x, y: this.blocks[this.blocks.length - 1].y + 1, moves: true} ));
   
 }
+
+function Menu (items, opts) {
+  this.items = items;
+  this.spacing = (opts.spacing) ? opts.spacing : 2*BLOCK_HEIGHT;
+  this.x = (opts.x) ? opts.x : (vpwidth() / 2 - 100);
+  this.y = (opts.y) ? opts.y : (vpheight() - 400);
+  
+  
+  items.forEach(function (e, i, a){
+    e.x = this.x;
+    e.y = this.y;
+    console.log(e.type);
+    if(e.type === "MenuItem") {
+      e.x += BLOCK_WIDTH;         //to make room for the cursor
+      e.y += (i-1)*this.spacing;  //since item 0 of a menu is always the cursor object
+    }
+  }, this);
+  
+  this.render = function () {
+    items.forEach(function (e, i, a) {
+      e.render();
+    });
+  }
+}
+
+function Cursor (opts) {
+ this.render = function () {
+   
+ };
+}
+
+function Text (opts) {
+  this.type = (opts.type) ? opts.type : "Title";
+  this.text = (opts.text) ? opts.text : "OUROBOROS";
+  
+  this.x = (opts.x) ? opts.x : ((vpwidth() / 2) - 130);
+  this.y = (opts.y) ? opts.y : ((vpheight() / 2) - 200);
+  
+  this.fontFamily = "MS Shell DLG, Arial, fantasy";
+  this.color = (opts.color) ? opts.color : "#282828";
+  switch(this.type){
+    case "Title":
+      this.fontSize = "32pt";
+      break;
+    case "MenuItem":
+      this.fontSize = "22pt";
+      break;
+  }
+  
+  this.move = function () {
+    // hover effect -- think Hotline Miami
+    return;
+  }
+  
+  this.render = function () {
+    ctx.beginPath();
+    ctx.font = this.fontSize + " " + this.fontFamily;
+    ctx.fillStyle = this.color;
+    ctx.fillText(this.text, this.x, this.y);
+    ctx.closePath();
+  }
+}
