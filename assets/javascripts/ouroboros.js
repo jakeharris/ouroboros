@@ -14,8 +14,6 @@ var vpheight = function () {
    return window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
 }
 
-
-
 /* =====
  * TYPES
  * =====
@@ -40,42 +38,9 @@ Direction = {
   DOWN: 3
 }
 
-function Scene (name, opts) {
-  this.name = name;
-  this.entities = (opts.entities) ? opts.entities : [ new Snake({ }, { }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
-  
-  this.logic = (opts.logic) ? opts.logic : function () {
-        if(!this.entities) {
-          this.entities = [ new Snake({ }, { }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
-          return;
-        }
-    
-        if(inputs.length != 0)
-            this.entities[0].direction = inputs.pop();
-        if(atWorldsEnd()) return respawn();
-        if(bitingSelf()) return respawn();
-        if(eatingEgg()) return eggSpawn();
-        return move();
-  };
-  this.render = (opts.render) ? opts.render : function () {
-        if(!entities) return;
-    
-        entities.forEach(function (e, i, a) {  
-          e.render();
-        });
-        
-        ctx.fillStyle = '#282828';
-        ctx.beginPath();
-        ctx.fillText('Score: ' + score, c.width/20, c.height/20);
-        ctx.fillText('High score: ' + highscore, c.width/20, c.height/10);
-        ctx.closePath();
-        ctx.fill();
-  };
-}
-
 function SnakeScene (opts) {
   this.name = "Snake";
-  this.entities = (opts.entities) ? opts.entities : [ new Snake({ }, { }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
+  this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }, { }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
   
   this.logic = (opts.logic) ? opts.logic : function () {
         if(!this.entities) {
@@ -83,8 +48,6 @@ function SnakeScene (opts) {
           return;
         }
     
-        if(inputs.length != 0)
-            this.entities[0].direction = inputs.pop();
         if(this.atWorldsEnd()) return this.respawn();
         if(this.bitingSelf()) return this.respawn();
         if(this.eatingEgg()) return this.eggSpawn();
@@ -178,7 +141,7 @@ this.move = function () {
 
 this.respawn = function () {
         if(!this.entities) return false;
-        this.entities = [ new Snake({ }, { }) ];
+        this.entities = [ new Snake({ size: 20 }, { }) ];
         if(highscore < score) highscore = score;
         score = 0;
         this.entities[1] =  new Block ({ fillStyle: '#CC3A09' }) ;
@@ -252,6 +215,10 @@ function Block (opts) {
       default:
         return false;
     }
+    /*if(this.x < 0) this.x = 59;
+    if(this.x > 59) this.x = 0;
+    if(this.y < 0) this.y = Math.floor( document.height/BLOCK_HEIGHT );
+    if(this.y > Math.floor( document.height/BLOCK_HEIGHT )) this.y = 0;*/
   };
   
   this.render = function () {
@@ -279,6 +246,8 @@ function Snake (opts, blockopts) {
         for(var x = 0; x < this.speed; x++) {
           this.tail = this.blocks.pop();
           this.tail.x = this.blocks[0].x; this.tail.y = this.blocks[0].y; this.tail.direction = this.blocks[0].direction;
+          if(inputs.length != 0)
+            this.tail.direction = inputs.pop();
           this.preventOuroboros();
           this.tail.move();
           this.blocks.unshift(this.tail)
