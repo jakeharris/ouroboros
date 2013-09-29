@@ -49,10 +49,6 @@ function Block (opts) {
       default:
         return false;
     }
-    /*if(this.x < 0) this.x = 59;
-    if(this.x > 59) this.x = 0;
-    if(this.y < 0) this.y = Math.floor( document.height/BLOCK_HEIGHT );
-    if(this.y > Math.floor( document.height/BLOCK_HEIGHT )) this.y = 0;*/
   };
   
   this.render = function () {
@@ -101,6 +97,8 @@ function Snake (opts, blockopts) {
   
   this.render = function () {
     this.blocks.forEach(function(e, i, a) {
+      if(i == 0) e.fillStyle = '#CCCC09';
+      else e.fillStyle = '#282828';
       e.render();
     });
   }
@@ -113,10 +111,9 @@ function Snake (opts, blockopts) {
 
 function Menu (items, opts) {
   this.items = items;
-  this.spacing = (opts.spacing) ? opts.spacing : 2*BLOCK_HEIGHT;
+  this.spacing = (opts.spacing) ? opts.spacing : 1*BLOCK_HEIGHT;
   this.x = (opts.x) ? opts.x : (vpwidth() / 2 - 100);
   this.y = (opts.y) ? opts.y : (vpheight() - 400);
-  
   
   items.forEach(function (e, i, a){
     e.x = this.x;
@@ -124,25 +121,35 @@ function Menu (items, opts) {
     console.log(e.type);
     if(e.type === "MenuItem") {
       e.x += BLOCK_WIDTH;         //to make room for the cursor
-      e.y += (i-1)*this.spacing;  //since item 0 of a menu is always the cursor object
+      e.y += i*this.spacing;  //since item 0 of a menu is always the cursor object
     } else e.y -= BLOCK_HEIGHT;
   }, this);
   
+  console.log('items.length: ' + items.length);
+  this.cursor = (opts.cursor) ? opts.cursor : new Cursor( { }, items.length );
+  
   this.render = function () {
+    this.cursor.render(this.x, this.y, this.spacing);
     items.forEach(function (e, i, a) {
       e.render();
     });
   }
   this.move = function () {
+    this.cursor.move();
     items.forEach(function (e, i, a) {
       e.move();
     });
   }
 }
 
-function Cursor (opts) {
-  this.x = (opts.x) ? opts.x : (vpwidth() / 2);
-  this.y = (opts.y) ? opts.y : (vpheight() / 2);
+function Cursor (opts, max) {
+  
+  console.log('max: ' + max);
+  console.log('max - 1: ' + (max - 1));
+  
+  this.i = (opts.i) ? opts.i : 0;
+  this.max = (max) ? (max - 1) : 3;
+  
   this.w = (opts.w) ? opts.w : BLOCK_WIDTH;
   this.h = (opts.h) ? opts.h : BLOCK_HEIGHT;
   
@@ -155,10 +162,12 @@ function Cursor (opts) {
     if(d){
       switch(d){
         case Direction.UP:
-          this.y -= 2*BLOCK_HEIGHT;
+          if ((this.i = this.i - 1) < 0) this.i = (this.max - 1);
+          console.log('i: ' + this.i + ', max: ' + this.max);
           break;
         case Direction.DOWN:
-          this.y += 2*BLOCK_HEIGHT;
+          if (++this.i >= this.max) this.i = 0;
+          console.log('i: ' + this.i + ', max: ' + this.max);
           break;
         case Direction.LEFT:
         case Direction.RIGHT:
@@ -170,10 +179,10 @@ function Cursor (opts) {
     
   };
   
-  this.render = function () {
+  this.render = function (x, y, spacing) {
     ctx.beginPath();
     ctx.fillStyle = this.fillStyle;
-    ctx.fillRect(this.x, this.y, this.w, this.h);
+    ctx.fillRect(x, y + (this.i * spacing), this.w, this.h);
     ctx.closePath();
   };
 }

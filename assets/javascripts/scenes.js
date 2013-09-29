@@ -19,6 +19,10 @@ function StartScene (opts) {
                                                               { }
                                                               )
                                                     ];
+  this.init = function () {
+    document.addEventListener('keydown', keyHandler); 
+  }
+  
   this.logic = (opts.logic) ? opts.logic : function () {
         if(!this.entities) {
           this.entities = [ 
@@ -50,7 +54,7 @@ function StartScene (opts) {
       e.render();
     });
   }
-  document.addEventListener('keydown', function (e) {
+  var keyHandler = function (e) {
     var d = scenes[cur].entities[0].direction,
         key = e.which;
     
@@ -60,11 +64,12 @@ function StartScene (opts) {
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '13') {
       cur++;
-      document.removeEventListener('keydown');
+      document.removeEventListener('keydown', keyHandler);
     }
     
     inputs.push(d);
-  });
+  }
+  this.init();
 }
 
 
@@ -88,6 +93,10 @@ function StartScene (opts) {
 function SnakeScene (opts) {
   this.name = "Snake";
   this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }, { }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
+  
+  this.init = function () {
+    document.addEventListener('keydown', keyHandler); 
+  }
   
   this.logic = (opts.logic) ? opts.logic : function () {
         if(!this.entities) {
@@ -229,7 +238,7 @@ this.growSnake = function () {
         snakeBlocks.push(block);
         this.entities[0].blocks = snakeBlocks;
       };
-  this.inputEvents = function(e) {
+  var keyHandler = function (e) {
     var d = scenes[cur].entities[0].direction,
         key = e.which;
     
@@ -240,9 +249,25 @@ this.growSnake = function () {
     else if (key == '27' || key == '80') pause();
     
     inputs.push(d);
-    console.log('inputs[0]: ' + inputs[0]);
   };
-  //document.addEventListener('keydown', this.inputEvents());
+  this.init();
 }
 
+function TransitionScene (opts, passables) {
+  this.name = "Transition";
+  this.passables = passables;
   
+  this.logic = function () {
+    
+  };
+  this.move = function () {
+    
+  };
+  this.render = function () {
+    
+  };
+}
+
+function ShopScene (opts) {
+  this.name = "Shop";
+}
