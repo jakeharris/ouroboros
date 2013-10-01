@@ -8,10 +8,10 @@
 
 function StartScene (opts) {
   this.name = "Start Menu";
+  this.initialized = false;
   this.entities = (opts.entities) ? opts.entities : [  
                                                       new Text({ type: 'Title', text: 'OUROBOROS' }), 
                                                       new Menu([
-                                                                new Cursor({ }),
                                                                 new Text({ type: 'MenuItem', text: 'New Game' }),
                                                                 new Text({ type: 'MenuItem', text: 'Continue' }),
                                                                 new Text({ type: 'MenuItem', text: 'Arcade Mode' })
@@ -20,15 +20,16 @@ function StartScene (opts) {
                                                               )
                                                     ];
   this.init = function () {
-    document.addEventListener('keydown', keyHandler); 
-  }
+    document.addEventListener('keydown', keyHandler);
+    this.initialized = true;
+  };
   
   this.logic = (opts.logic) ? opts.logic : function () {
+        if(!this.initialized) this.init();
         if(!this.entities) {
           this.entities = [ 
                             new Text({ type: 'Title', text: 'OUROBOROS' }), 
                             new Menu([
-                              new Cursor({ }),
                               new Text({ type: 'MenuItem', text: 'New Game' }),
                               new Text({ type: 'MenuItem', text: 'Continue' }),
                               new Text({ type: 'MenuItem', text: 'Arcade Mode' })
@@ -53,7 +54,8 @@ function StartScene (opts) {
     this.entities.forEach(function (e, i, a) {
       e.render();
     });
-  }
+  };
+  
   var keyHandler = function (e) {
     var d = scenes[cur].entities[0].direction,
         key = e.which;
@@ -66,10 +68,9 @@ function StartScene (opts) {
       cur++;
       document.removeEventListener('keydown', keyHandler);
     }
-    
+    console.log('keyHandler ran');
     inputs.push(d);
   }
-  this.init();
 }
 
 
@@ -92,13 +93,16 @@ function StartScene (opts) {
 
 function SnakeScene (opts) {
   this.name = "Snake";
+  this.initialized = false;
   this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }, { }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
   
   this.init = function () {
     document.addEventListener('keydown', keyHandler); 
+    this.initialized = true;
   }
   
   this.logic = (opts.logic) ? opts.logic : function () {
+        if(!this.initialized) this.init();
         if(!this.entities) {
           this.entities = [ new Snake({ }, { }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
           return;
@@ -247,10 +251,8 @@ this.growSnake = function () {
     else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '27' || key == '80') pause();
-    
     inputs.push(d);
   };
-  this.init();
 }
 
 function TransitionScene (opts, passables) {
