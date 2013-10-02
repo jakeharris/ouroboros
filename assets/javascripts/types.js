@@ -76,11 +76,13 @@ function Snake (opts, blockopts) {
         for(var x = 0; x < this.speed; x++) {
           this.tail = this.blocks.pop();
           this.tail.x = this.blocks[0].x; this.tail.y = this.blocks[0].y; this.tail.direction = this.blocks[0].direction;
-          if(inputs.length > 0)
-            this.direction = inputs.pop();
+          if(inputs.length > 0) {
+            var i = inputs.pop();
+            this.direction = (i !== undefined) ? i : this.direction;
+          }
           this.preventOuroboros();
           this.tail.move();
-          this.blocks.unshift(this.tail)
+          this.blocks.unshift(this.tail);
         }
         this.loops = 0;
     }
@@ -111,7 +113,7 @@ function Snake (opts, blockopts) {
 
 function Menu (items, opts) {
   this.items = items;
-  this.spacing = (opts.spacing) ? opts.spacing : BLOCK_HEIGHT;
+  this.spacing = (opts.spacing) ? opts.spacing : 2*BLOCK_HEIGHT;
   this.x = (opts.x) ? opts.x : (vpwidth() / 2 - 100);
   this.y = (opts.y) ? opts.y : (vpheight() - 400);
   this.cursor = new Cursor ( items.length - 1, { } )
@@ -151,18 +153,8 @@ function Cursor (max, opts) {
   
   this.move = function () {
     var d;
-    if(inputs.length != 0) {
-      console.log('inputs.length: ' + inputs.length);
-      console.log('---inputs---');
-      inputs.forEach(function (e, i, a) {
-        console.log('' + i + ': ' + e);
-      });
-    }
     if(inputs.length > 0) {  d = inputs.pop(); }
     if(d) {
-      console.log('move data: ');
-      console.log('d: ' + d);
-      
       switch(d){
         case Direction.UP:
           if (--this.i < 0) this.i = this.max;
@@ -182,7 +174,7 @@ function Cursor (max, opts) {
   this.render = function (x, y, spacing) {
     ctx.beginPath();
     ctx.fillStyle = this.fillStyle;
-    ctx.fillRect(x, y + (this.i * spacing) - spacing, this.w, this.h);
+    ctx.fillRect(x, y + (this.i * spacing) - BLOCK_HEIGHT, this.w, this.h);
     ctx.closePath();
   };
 }

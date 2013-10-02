@@ -65,10 +65,17 @@ function StartScene (opts) {
     else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '13') {
-      cur++;
-      document.removeEventListener('keydown', keyHandler);
+      switch(scenes[cur].entities[1].cursor.i){ 
+          case 2:
+            cur++;
+            document.removeEventListener('keydown', keyHandler);
+            return;
+          case 0:
+          case 1:
+          default:
+            break;
+      }
     }
-    console.log('keyHandler ran');
     inputs.push(d);
   }
 }
@@ -94,7 +101,10 @@ function StartScene (opts) {
 function SnakeScene (opts) {
   this.name = "Snake";
   this.initialized = false;
-  this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }, { }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
+  this.id = (opts.id) ? opts.id : 0;
+  this.score = (opts.score) ? opts.score : 0;
+  this.maxScore = (opts.score) ? opts.score : 50;
+  this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
   
   this.init = function () {
     document.addEventListener('keydown', keyHandler); 
@@ -104,15 +114,30 @@ function SnakeScene (opts) {
   this.logic = (opts.logic) ? opts.logic : function () {
         if(!this.initialized) this.init();
         if(!this.entities) {
-          this.entities = [ new Snake({ }, { }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
+          this.entities = [ new Snake({ }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
           return;
         }
     
-        if(this.atWorldsEnd()) return this.respawn();
-        if(this.bitingSelf()) return this.respawn();
+        if(this.score >= this.maxScore) {
+          this.score = this.maxScore; //just in case someone cheated!
+          return this.end();
+        }
+        if(this.atWorldsEnd()) return this.end();
+        if(this.bitingSelf()) return this.end();
         if(this.eatingEgg()) return this.eggSpawn();
         return this.move();
   };
+
+  this.end = function () {
+    if(scores[this.id]){
+      if(this.score > scores[this.id]){
+        score += (this.score - scores[this.id]);
+        scores[this.id] = this.score;
+      }
+    } else score += (scores[this.id] = this.score);
+    cur++;
+  };
+  
   this.render = (opts.render) ? opts.render : function () {
         if(!this.entities) return;
     

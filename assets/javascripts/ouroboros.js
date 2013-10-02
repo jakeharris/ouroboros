@@ -14,6 +14,7 @@ var width = vpwidth(),
     inputs = [],
     paused = false,
     score = 0,
+    scores = [],
     highscore = 0;
 
 ctx.font = "22pt Arial";
@@ -37,7 +38,7 @@ var clear = function () {
 var render = function () { 
         if(!scenes || !scenes[0]) scenes = [ new StartScene({ }), new SnakeScene({ }) ];
         if(!scenes[cur]) {
-          console.log("Current scene variable c has exceeded legal bounds. (val: " + c + ").")
+          console.log("Current scene variable cur has exceeded legal bounds. (val: " + cur + ").")
           //return false;
         }
         scenes[cur].render();
@@ -46,7 +47,7 @@ var render = function () {
 var logic = function () {
         if(!scenes || !scenes[0]) scenes = [ new StartScene({ }), new SnakeScene({ }) ];
         if(!scenes[cur]) {
-          console.log("Current scene variable c has exceeded legal bounds. (val: " + c + ").")
+          console.log("Current scene variable cur has exceeded legal bounds. (val: " + cur + ").")
           //return false;
         }
         scenes[cur].logic();
