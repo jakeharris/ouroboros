@@ -23,15 +23,16 @@ Direction = {
 }
 
 function Block (opts) {
-  this.x = (opts.x) ? opts.x : Math.floor(Math.random() * Math.floor( document.width/BLOCK_WIDTH )), 
-  this.y = (opts.y) ? opts.y : Math.floor(Math.random() * Math.floor( document.height/BLOCK_HEIGHT )),
+  this.x = (opts.x !== undefined) ? opts.x : Math.floor(Math.random() * Math.floor( document.width/BLOCK_WIDTH )), 
+  this.y = (opts.y !== undefined) ? opts.y : Math.floor(Math.random() * Math.floor( document.height/BLOCK_HEIGHT )),
   this.width = BLOCK_WIDTH,
   this.height = BLOCK_HEIGHT,
   this.moves = (opts.moves) ? opts.moves : false,
   this.fillStyle = (opts.fillStyle) ? opts.fillStyle : '#282828'; /* must be a color or a gradient or a pattern */
   
   this.multiplier = 1;
-  this.direction = (opts.direction) ? opts.direction : Direction.UP;
+  this.direction = (opts.direction !== undefined) ? opts.direction : Direction.UP;
+  
   this.move = function () {
     switch (this.direction) {
       case Direction.LEFT:
@@ -63,13 +64,29 @@ function Block (opts) {
   };
 }
 
+function getDirectionFromWallProximity(b) { //b for block
+  switch(Math.min(b.x, b.y, (Math.floor( document.width/BLOCK_WIDTH ) - b.x), (Math.floor( document.height/BLOCK_HEIGHT ) - b.y))) {
+    case b.x: //nearest the left wall
+      return (b.direction = Direction.RIGHT);
+    case b.y: //nearest the top wall
+      return (b.direction = Direction.DOWN);
+    case (Math.floor( document.width/BLOCK_WIDTH ) - b.x):
+      return (b.direction = Direction.LEFT);
+    case (Math.floor( document.height/BLOCK_HEIGHT ) - b.y):
+      return (b.direction = Direction.UP);
+    default:
+      return (b.direction = Direction.UP);
+  }
+}
+
 function Snake (opts, blockopts) {
   this.blocks = (blockopts) ? [ new Block (blockopts) ] : [ new Block ({ moves: true }) ],
   this.speed = (opts.speed) ? opts.speed : SNAKE_BASE_SPEED,
   this.loops_to_move = (opts.loops) ? opts.loops : SNAKE_BASE_LOOPS_TO_MOVE,
   this.loops = 0;
   this.tail;
-  this.direction = (opts.direction) ? opts.direction : Direction.UP;
+  this.direction = (opts.direction) ? opts.direction : getDirectionFromWallProximity(this.blocks[0]);
+  
   this.moves = true;
   this.move = function () {
     if(++this.loops >= this.loops_to_move) {
@@ -105,9 +122,35 @@ function Snake (opts, blockopts) {
     });
   }
   
-  var size = (opts.size) ? opts.size : SNAKE_BASE_LENGTH;
+  var size = (opts.size) ? opts.size : SNAKE_BASE_LENGTH,
+      xmod = 0,
+      ymod = 0;
   
-  while(this.blocks.length < size) this.blocks.push (new Block( { x: this.blocks[this.blocks.length - 1].x, y: this.blocks[this.blocks.length - 1].y + 1, moves: true} ));
+  switch(this.blocks[0].direction){
+      case Direction.LEFT:
+        xmod = 1;
+        break;
+      case Direction.UP:
+        ymod = 1;
+        break;
+      case Direction.RIGHT:
+        xmod = -1;
+        break;
+      case Direction.DOWN:
+        ymod = -1;
+        break;
+      default:
+        ymod = 1;
+        break;
+  }
+  
+  while(this.blocks.length < size) 
+    this.blocks.push (new Block( { 
+                                  x: this.blocks[this.blocks.length - 1].x + xmod, 
+                                  y: this.blocks[this.blocks.length - 1].y + ymod, 
+                                  moves: true, 
+                                  direction: this.blocks[0].direction
+                                } ));
   
 }
 
@@ -121,7 +164,7 @@ function Menu (items, opts) {
   items.forEach(function (e, i, a) {
     e.x = this.x;
     e.y = this.y;
-    if(e.type === "MenuItem") {
+    if(e.type === "MenuItem" || typeof e === "MenuItem") {
       e.x += BLOCK_WIDTH;
       e.y += i*this.spacing;
     }
@@ -179,6 +222,38 @@ function Cursor (max, opts) {
   };
 }
 
+// for when simple text won't cut it
+function ShopItem (opts) {
+  this.type = (opts.type) ? opts.type : "MenuItem";
+  this.text = (opts.text) ? opts.text : "Smooth underbelly";
+  this.id = (opts.id) ? opts.id : 0;
+  this.val = (opts.val) ? opts.val : 10;
+  this.flavorText = (opts.flavorText) ? opts.flavorText : "Lets you start faster";  
+  
+  this.x = (opts.x !== undefined) ? opts.x : ((vpwidth() / 2) - 130);
+  this.y = (opts.y !== undefined) ? opts.y : ((vpheight() / 2) - 200);
+  this.w = (opts.w !== undefined) ? opts.w : (vpwidth() / 2);
+  
+  this.fontFamily = "MS Shell DLG, Arial, fantasy";
+  this.fillStyle = (opts.fillStyle) ? opts.fillStyle : "#282828";
+  this.altFillStyle = (opts.altFillStyle) ? opts.altFillStyle : "#505050";
+  this.fontSize = "22pt";
+  
+  this.move = function () {
+    // hover effect -- think Hotline Miami
+    return;
+  }
+  
+  this.render = function () {
+    ctx.beginPath();
+    ctx.font = this.fontSize + " " + this.fontFamily;
+    ctx.fillStyle = this.fillStyle;
+    ctx.fillText(this.text, this.x, this.y);
+    ctx.fillStyle = this.altFillStyle;
+    ctx.fillText(this.val, this.x + this.w - 50, this.y);
+    ctx.closePath();
+  }
+}
 
 function Text (opts) {
   this.type = (opts.type) ? opts.type : "Title";

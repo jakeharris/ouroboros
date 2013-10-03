@@ -15,6 +15,7 @@ var width = vpwidth(),
     paused = false,
     score = 0,
     scores = [],
+    upgrades = [],
     highscore = 0;
 
 ctx.font = "22pt Arial";
@@ -36,7 +37,7 @@ var clear = function () {
     };
 
 var render = function () { 
-        if(!scenes || !scenes[0]) scenes = [ new StartScene({ }), new SnakeScene({ }) ];
+        if(!scenes || !scenes[0]) scenes = [ new StartScene({ }), new SnakeScene({ }), new ShopScene({ }) ];
         if(!scenes[cur]) {
           console.log("Current scene variable cur has exceeded legal bounds. (val: " + cur + ").")
           //return false;
@@ -45,7 +46,7 @@ var render = function () {
     };
 
 var logic = function () {
-        if(!scenes || !scenes[0]) scenes = [ new StartScene({ }), new SnakeScene({ }) ];
+        if(!scenes || !scenes[0]) scenes = [ new StartScene({ }), new SnakeScene({ }), new ShopScene({ }) ];
         if(!scenes[cur]) {
           console.log("Current scene variable cur has exceeded legal bounds. (val: " + cur + ").")
           //return false;

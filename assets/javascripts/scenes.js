@@ -5,28 +5,28 @@
    The different sections of the game.
  
  */
-
-function StartScene (opts) {
-  this.name = "Start Menu";
-  this.initialized = false;
-  this.entities = (opts.entities) ? opts.entities : [  
-                                                      new Text({ type: 'Title', text: 'OUROBOROS' }), 
-                                                      new Menu([
-                                                                new Text({ type: 'MenuItem', text: 'New Game' }),
-                                                                new Text({ type: 'MenuItem', text: 'Continue' }),
-                                                                new Text({ type: 'MenuItem', text: 'Arcade Mode' })
-                                                               ], 
-                                                              { }
-                                                              )
-                                                    ];
-  this.init = function () {
-    document.addEventListener('keydown', keyHandler);
-    this.initialized = true;
-  };
+function StartScene(opts) {
+    "use strict";
+    this.name = "Start Menu";
+    this.initialized = false;
+    this.entities = opts.entities || [
+        new Text({ type: 'Title', text: 'OUROBOROS' }),
+        new Menu([
+            new Text({ type: 'MenuItem', text: 'New Game' }),
+            new Text({ type: 'MenuItem', text: 'Continue' }),
+            new Text({ type: 'MenuItem', text: 'Arcade Mode' })
+        ],
+            { }
+                )
+    ];
+    this.init = function () {
+        document.addEventListener('keydown', keyHandler);
+        this.initialized = true;
+    };
   
-  this.logic = (opts.logic) ? opts.logic : function () {
-        if(!this.initialized) this.init();
-        if(!this.entities) {
+    this.logic = (opts.logic) ? opts.logic : function () {
+        if (!this.initialized) this.init();
+        if (!this.entities) {
           this.entities = [ 
                             new Text({ type: 'Title', text: 'OUROBOROS' }), 
                             new Menu([
@@ -134,7 +134,12 @@ function SnakeScene (opts) {
         score += (this.score - scores[this.id]);
         scores[this.id] = this.score;
       }
-    } else score += (scores[this.id] = this.score);
+    } else {
+      score += scores[this.id] = this.score;
+    }
+    document.removeEventListener('keydown', keyHandler);
+    this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
+    this.initialized = false;
     cur++;
   };
   
@@ -233,7 +238,7 @@ this.eggSpawn = function () {
         if(!this.entities[0]) return respawn();
         this.entities[1] =  new Block ({ fillStyle: '#CC3A09' }) ;
         this.growSnake();
-        score++;
+        this.score++;
         this.entities[0].loops_to_move = (this.entities[0].loops_to_move)*0.95 //used to be //entities[0].loops_to_move--;
       };
 
@@ -297,4 +302,86 @@ function TransitionScene (opts, passables) {
 
 function ShopScene (opts) {
   this.name = "Shop";
+  this.initialized = false;
+  this.walletUpdated = true;
+  this.spent = (opts.spent !== undefined) ? opts.spent : 0;
+  this.entities = [ 
+                    new Text( { type: "Title", text: this.name } ),
+                    new Menu( [
+                                new ShopItem( {  } ), // default item is smooth underbelly (gives faster start)
+                                new ShopItem( { text: "Slow breeze", val: 40, flavorText: "Slows breeze in an area to a balmy calm", id: 1 } ), //gives 1 breeze (slows time)
+                                new ShopItem( { text: "Golden plumes", val: 100, flavorText: "Allows true ouroboros (try leaving the map)", id: 2 } ), //allows map-wrap
+                                new ShopItem( { text: "Aerobody", val: 100, flavorText: "Transforms pieces of the body into raw, elemental, air magic", id: 3 } ), //segments of unit collision avoidance in the body
+                                new Text( { type: "MenuItem", text: "Exit shop" } )
+                    ], { } ),
+                    new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: 175 })
+  ];
+  
+  this.init = function () {
+    this.initialized = true; 
+    this.walletUpdated = true;
+    document.addEventListener('keydown', keyHandler);
+  };
+  
+  this.render = function () {
+    this.entities.forEach(function (e, i, a) {
+      e.render();
+    });
+  };
+  
+  this.logic = function () {
+    if(!this.initialized) this.init();
+    if(!this.entities) {
+      this.entities = [ 
+                    new Text( { type: "Title", text: this.name } ),
+                    new Menu( [
+                                new ShopItem( {  } ), // default item is smooth underbelly (gives faster start)
+                                new ShopItem( { text: "Slow breeze", val: 40, flavorText: "Slows breeze in an area to a balmy calm", id: 1 } ), //gives 1 breeze (slows time)
+                                new ShopItem( { text: "Golden plumes", val: 100, flavorText: "Allows true ouroboros (try leaving the map)", id: 2 } ), //allows map-wrap
+                                new ShopItem( { text: "Aerobody", val: 100, flavorText: "Transforms pieces of the body into raw, elemental, air magic", id: 3 } ), //segments of unit collision avoidance in the body
+                                new Text( { type: "MenuItem", text: "Exit shop" } )
+                    ], { } ),
+                    new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: 175 })
+      ];
+      return;
+    }
+    if(this.walletUpdated) {
+      this.wallet = score - this.spent;
+      this.entities[2].text = "Eggs remaining: " + this.wallet;
+    }
+    this.walletUpdated = false;
+    return this.move();
+  };
+  
+  this.move = function () {
+    this.entities.forEach(function (e, i, a) {
+      e.move();
+    });
+  };
+  
+  var keyHandler = function (e) {
+    var d,
+        key = e.which;
+    
+    if      (key == '37' && d != Direction.RIGHT) d = Direction.LEFT;
+    else if (key == '38' && d != Direction.DOWN)  d = Direction.UP;
+    else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
+    else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
+    else if (key == '13'){
+      if(scenes[cur].entities[1].cursor.i == scenes[cur].entities[1].items.length - 1) {
+        scenes[cur].initialized = false;
+        document.removeEventListener('keydown', keyHandler);
+        cur--;
+        return;
+      }
+      if(scenes[cur].entities[1].items[scenes[cur].entities[1].cursor.i].val <= scenes[cur].wallet ) {
+         scenes[cur].spent += scenes[cur].entities[1].items[scenes[cur].entities[1].cursor.i].val;
+         scenes[cur].wallet -= scenes[cur].entities[1].items[scenes[cur].entities[1].cursor.i].val;
+         scenes[cur].walletUpdated = true;
+         upgrades.push(scenes[cur].entities[1].items[scenes[cur].entities[1].cursor.i].id);
+      }
+    }
+    inputs.push(d);
+  };
+  
 }
