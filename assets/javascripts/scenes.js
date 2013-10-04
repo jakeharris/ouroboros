@@ -144,6 +144,7 @@ function SnakeScene (opts) {
   
   this.end = function () {
     document.removeEventListener('keydown', keyHandler);
+    if(this.isArcadeMode) arcadeTimeLooper = clearInterval(arcadeTimeLooper);
     this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
     this.score = 0;
     this.initialized = false;
@@ -349,6 +350,12 @@ function ShopScene (opts) {
                                   flavorText: Upgrades.Aerobody.flavorText, 
                                   id: Upgrades.Aerobody.id
                                 } ), //segments of unit collision avoidance in the body
+                                new ShopItem( {
+                                    text: Upgrades.TimeExtension.name,
+                                    val: Upgrades.TimeExtension.price,
+                                    flavorText: Upgrades.TimeExtension.flavorText,
+                                    id: Upgrades.TimeExtension.id
+                                } ), //+30s
                                 new Text( { type: "MenuItem", text: "Exit shop" } )
                     ], { x: vpwidth() / 4,y: vpheight() / 5 } ),
                     new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: vpheight()/10 })
@@ -379,25 +386,31 @@ function ShopScene (opts) {
                                   id: Upgrades.SmoothUnderbelly.id
                                 } ), // smooth underbelly (gives faster start)
                                 new ShopItem( { 
-                                  text: "Slow breeze", 
-                                  val: 40, 
-                                  flavorText: "Slows breeze in an area to a balmy calm", 
-                                  id: 1 
+                                  text: Upgrades.StillAir.name, 
+                                  val: Upgrades.StillAir.price, 
+                                  flavorText: Upgrades.StillAir.flavorText, 
+                                  id: Upgrades.StillAir.id
                                 } ), //gives 1 breeze (slows time)
                                 new ShopItem( { 
-                                  text: "Golden plumes", 
-                                  val: 100, 
-                                  flavorText: "Allows true ouroboros (try leaving the map)", 
-                                  id: 2 
+                                  text: Upgrades.GoldenPlumes.name,
+                                  val: Upgrades.GoldenPlumes.price, 
+                                  flavorText: Upgrades.GoldenPlumes.flavorText, 
+                                  id: Upgrades.GoldenPlumes.id
                                 } ), //allows map-wrap
                                 new ShopItem( { 
-                                  text: "Aerobody", 
-                                  val: 100, 
-                                  flavorText: "", 
-                                  id: 3 
+                                  text: Upgrades.Aerobody.name, 
+                                  val: Upgrades.Aerobody.price, 
+                                  flavorText: Upgrades.Aerobody.flavorText, 
+                                  id: Upgrades.Aerobody.id
                                 } ), //segments of unit collision avoidance in the body
+                                new ShopItem( {
+                                    text: Upgrades.TimeExtension.name,
+                                    val: Upgrades.TimeExtension.price,
+                                    flavorText: Upgrades.TimeExtension.flavorText,
+                                    id: Upgrades.TimeExtension.id
+                                } ), //+30s
                                 new Text( { type: "MenuItem", text: "Exit shop" } )
-                    ], { } ),
+                    ], { x: vpwidth() / 4,y: vpheight() / 5 } ),
                     new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: vpheight()/20 })
       ];
       return;
@@ -418,9 +431,10 @@ function ShopScene (opts) {
   
   this.buy = function (i) {
     if(this.entities[1].items[i].soldOut) return false;
+    console.log(this.entities[1].items[i]);
     for (var u in Upgrades) {
       if (!Upgrades.hasOwnProperty(u)) continue;
-      if(Upgrades[u] == this.entities[1].items[i]) {
+      if(Upgrades[u].id === this.entities[1].items[i].id) {
         upgrades.push(Upgrades[u]);
         if(Upgrades[u].isUnique) this.entities[1].items[i].soldOut = true;
         if(Upgrades[u] === Upgrades.TimeExtension) arcadeTimeLimit += 30;
