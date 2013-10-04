@@ -15,6 +15,12 @@ var vpheight = function () {
    return window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
 }
 
+function hasUpgrade(p){
+  for(var u in upgrades) {
+        if(upgrades[u] === p) return true;
+  }
+  return false;
+}
 
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   if (w < 2 * r) r = w / 2;

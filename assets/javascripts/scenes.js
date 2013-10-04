@@ -5,6 +5,7 @@
    The different sections of the game.
  
  */
+
 function StartScene(opts) {
     "use strict";
     this.name = "Start Menu";
@@ -12,8 +13,8 @@ function StartScene(opts) {
     this.entities = opts.entities || [
         new Text({ type: 'Title', text: 'OUROBOROS' }),
         new Menu([
-            new Text({ type: 'MenuItem', text: 'New Game' }),
-            new Text({ type: 'MenuItem', text: 'Continue' }),
+            new Text({ type: 'MenuItem', text: 'New Game (coming soon!)' }),
+            new Text({ type: 'MenuItem', text: 'Continue (coming soon!)' }),
             new Text({ type: 'MenuItem', text: 'Arcade Mode' })
         ],
             { }
@@ -106,9 +107,13 @@ function SnakeScene (opts) {
   this.score = (opts.score) ? opts.score : 0;
   this.maxScore = (opts.score) ? opts.score : 50;
   this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
+  arcadeTimeLimit = ARCADE_TIMER_STARTING_MAX;
   
   this.init = function () {
-    document.addEventListener('keydown', keyHandler); 
+    document.addEventListener('keydown', keyHandler);
+    if(this.isArcadeMode) {
+      arcadeTimeLooper = setInterval(function () { arcadeTimer++; }, 1000); 
+    }
     this.initialized = true;
   }
   
@@ -123,12 +128,20 @@ function SnakeScene (opts) {
           this.score = this.maxScore; //just in case someone cheated!
           return this.end();
         }
-        if(this.atWorldsEnd()) return this.end();
+        if(this.atWorldsEnd()) {
+          if(hasUpgrade(Upgrades.GoldenPlumes)) return this.move();
+          return this.end();
+        }
+        if(this.isArcadeMode && this.timeIsUp()) return this.end();
         if(this.bitingSelf()) return this.end();
         if(this.eatingEgg()) return this.eggSpawn();
         return this.move();
   };
 
+  this.loopMove = function () {
+    
+  };
+  
   this.end = function () {
     document.removeEventListener('keydown', keyHandler);
     this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
@@ -148,6 +161,11 @@ function SnakeScene (opts) {
         ctx.beginPath();
         ctx.fillText('This life: ' + this.score, c.width/20, c.height/10);
         ctx.fillText('Total: ' + score, c.width/20, c.height/20);
+        if(this.isArcadeMode) {
+          var minutes = (Math.floor((arcadeTimeLimit - arcadeTimer) / 60)),
+              seconds = ((arcadeTimeLimit - arcadeTimer) - Math.floor((arcadeTimeLimit - arcadeTimer) / 60)*60);
+          ctx.fillText('' + minutes + ':' + ((seconds < 10) ? '0' + seconds : seconds), c.width/2, c.height/20);
+        }
         ctx.closePath();
         ctx.fill();
   };
@@ -202,7 +220,9 @@ function SnakeScene (opts) {
       
         return false;
       };
-  
+  this.timeIsUp = function () {
+    return arcadeTimeLimit - arcadeTimer < 0;
+  }
 /* ===============
  * SNAKE - ACTIONS
  * ===============
@@ -312,22 +332,22 @@ function ShopScene (opts) {
                                   id: Upgrades.SmoothUnderbelly.id
                                 } ), // smooth underbelly (gives faster start)
                                 new ShopItem( { 
-                                  text: "Slow breeze", 
-                                  val: 40, 
-                                  flavorText: "Slows breeze in an area to a balmy calm", 
-                                  id: 1 
+                                  text: Upgrades.StillAir.name, 
+                                  val: Upgrades.StillAir.price, 
+                                  flavorText: Upgrades.StillAir.flavorText, 
+                                  id: Upgrades.StillAir.id
                                 } ), //gives 1 breeze (slows time)
                                 new ShopItem( { 
-                                  text: "Golden plumes", 
-                                  val: 100, 
-                                  flavorText: "Allows true ouroboros (try leaving the map)", 
-                                  id: 2 
+                                  text: Upgrades.GoldenPlumes.name,
+                                  val: Upgrades.GoldenPlumes.price, 
+                                  flavorText: Upgrades.GoldenPlumes.flavorText, 
+                                  id: Upgrades.GoldenPlumes.id
                                 } ), //allows map-wrap
                                 new ShopItem( { 
-                                  text: "Aerobody", 
-                                  val: 100, 
-                                  flavorText: "Transforms pieces of the body into raw, elemental, air magic", 
-                                  id: 3 
+                                  text: Upgrades.Aerobody.name, 
+                                  val: Upgrades.Aerobody.price, 
+                                  flavorText: Upgrades.Aerobody.flavorText, 
+                                  id: Upgrades.Aerobody.id
                                 } ), //segments of unit collision avoidance in the body
                                 new Text( { type: "MenuItem", text: "Exit shop" } )
                     ], { x: vpwidth() / 4,y: vpheight() / 5 } ),
@@ -373,7 +393,7 @@ function ShopScene (opts) {
                                 new ShopItem( { 
                                   text: "Aerobody", 
                                   val: 100, 
-                                  flavorText: "Transforms pieces of the body into raw, elemental, air magic", 
+                                  flavorText: "", 
                                   id: 3 
                                 } ), //segments of unit collision avoidance in the body
                                 new Text( { type: "MenuItem", text: "Exit shop" } )
@@ -400,12 +420,10 @@ function ShopScene (opts) {
     if(this.entities[1].items[i].soldOut) return false;
     for (var u in Upgrades) {
       if (!Upgrades.hasOwnProperty(u)) continue;
-      if(Upgrades[u].id == i) {
+      if(Upgrades[u] == this.entities[1].items[i]) {
         upgrades.push(Upgrades[u]);
-        if(Upgrades[u].isUnique) {
-          // TODO: MAKE THIS NOT SHIT
-          this.entities[1].items[i].soldOut = true;
-        }
+        if(Upgrades[u].isUnique) this.entities[1].items[i].soldOut = true;
+        if(Upgrades[u] === Upgrades.TimeExtension) arcadeTimeLimit += 30;
       }
     }
     

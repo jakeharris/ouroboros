@@ -11,6 +11,9 @@ var width = vpwidth(),
     scenes = [],
     cur = 0,
     game,
+    arcadeTimeLooper,
+    arcadeTimer = 0,
+    arcadeTimeLimit = 0,
     inputs = [],
     paused = false,
     score = 0,
@@ -79,9 +82,11 @@ var pause = function () {
         renderPause();
         if(!paused) {
           game = clearTimeout(game);
+          arcadeTimeLooper = clearInterval(arcadeTimeLooper);
           paused = true;
         } else {
           game = setTimeout(loop, 10);
+          arcadeTimeLooper = setInterval(function () { arcadeTimer++; }, 1000);
           paused = false;
         }
 }

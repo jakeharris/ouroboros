@@ -14,6 +14,7 @@ var BLOCK_WIDTH = Math.floor(vpwidth() / 60),
     SNAKE_BASE_SPEED = 1,
     SNAKE_BASE_LOOPS_TO_MOVE = 20,
     SNAKE_BASE_LENGTH = 4;
+    ARCADE_TIMER_STARTING_MAX = 300; // (in seconds) (hopefully)
 
 Direction = {
   LEFT: 0,
@@ -32,8 +33,43 @@ Upgrades.SmoothUnderbelly = {
    price: 10,
    flavorText: "Lets you start faster. Carpe diem!",
    isUnique: true, // means you can only buy it once
-   speed: SNAKE_BASE_LOOPS_TO_MOVE * Math.pow(0.95, 10) // moves like you already have a score of 10
- }; 
+   speed: SNAKE_BASE_LOOPS_TO_MOVE * Math.pow(0.95, 10), // moves like you already have a score of 10
+   fillStyle: "#CC3A09"
+}; 
+
+Upgrades.StillAir = {
+  id: 1,
+  name: "Still air",
+  price: 40,
+  flavorText: "Slows down everything in an area to a balmy calm. Consumable.",
+  isUnique: false
+};
+
+
+
+Upgrades.GoldenPlumes = {
+  id: 2,
+  name: "Golden plumes",
+  price: 100,
+  flavorText: "Allows true ouroboros. Try leaving the map to see!",
+  isUnique: true
+};
+
+Upgrades.Aerobody = {
+  id: 3,
+  name: "Aerobody",
+  price: 100,
+  flavorText: "Transforms pieces of the body into raw, elemental, air magic.",
+  isUnique: true
+}
+
+Upgrades.TimeExtension = {
+  id: 4,
+  name: "+30s",
+  price: 10,
+  flavorText: "",
+  isUnique: false
+}
 
 function Block (opts) {
   this.x = (opts.x !== undefined) ? opts.x : Math.floor(Math.random() * Math.floor( document.width/BLOCK_WIDTH )), 
@@ -63,6 +99,17 @@ function Block (opts) {
       default:
         return false;
     }
+    if(hasUpgrade(Upgrades.GoldenPlumes) && (this.x < 0 || this.x > document.width/BLOCK_WIDTH - 1 || this.y < 0 || this.y > document.height/BLOCK_WIDTH - 1)) {
+      if(this.x < 0) {
+        this.x = document.width/BLOCK_WIDTH - 1; 
+      } else if (this.x > document.width/BLOCK_WIDTH - 1) {
+        this.x = 0; 
+      } else if (this.y < 0) {
+        this.y = Math.floor(document.height/BLOCK_WIDTH) - 1; 
+      } else if (this.y > document.height/BLOCK_WIDTH - 1) {
+        this.y = 0; 
+      }
+    }
   };
   
   this.render = function () {
@@ -74,6 +121,34 @@ function Block (opts) {
                    (this.height)? BLOCK_HEIGHT : 0); /* make this handle different shapes, images, etc. */
           ctx.closePath();
           ctx.fill();
+          // TODO: WORK IN PROGRESS. ADDS A RED LINE TO ONE SIDE OF THE SNAKE WHEN YOU HAVE THE SMOOTH UNDERBELLY UPGRADE.
+          /*if (hasUpgrade(Upgrades.SmoothUnderbelly)) {
+            var x = 0,
+                y = 0,
+                width = 0,
+                height = 0;
+            switch(this.direction) {
+              case Direction.LEFT:
+              case Direction.RIGHT:
+                y = BLOCK_HEIGHT - 2;
+                width = BLOCK_WIDTH;
+                height = 2;
+                break;
+              case Direction.UP:
+              case Direction.DOWN:
+                x = BLOCK_WIDTH - 2;
+                width = 2;
+                height = BLOCK_HEIGHT;
+            }
+            ctx.fillStyle = Upgrades.SmoothUnderbelly.fillStyle;
+            ctx.beginPath();
+            ctx.rect(this.x*BLOCK_WIDTH + x,
+                     this.y*BLOCK_HEIGHT + y,
+                     width,
+                     height);
+            ctx.closePath();
+            ctx.fill();
+          }*/
   };
 }
 
@@ -104,12 +179,8 @@ function Snake (opts, blockopts) {
   this.move = function () {
     var loopsToMove = this.loopsToMove;
     if(loopsToMove > Upgrades.SmoothUnderbelly.speed) {
-      for(var u in upgrades) {
-        if(upgrades[u] === Upgrades.SmoothUnderbelly) {
-          console.log('SmoothUnderbelly active');
+      if(hasUpgrade(Upgrades.SmoothUnderbelly)) {
           loopsToMove = Upgrades.SmoothUnderbelly.speed; 
-          break;
-        }
       }
     }
     if(++this.loops >= loopsToMove) {
@@ -139,7 +210,7 @@ function Snake (opts, blockopts) {
   
   this.render = function () {
     this.blocks.forEach(function(e, i, a) {
-      if(i == 0) e.fillStyle = '#CCCC09';
+      if(i == 0 && hasUpgrade(Upgrades.GoldenPlumes)) e.fillStyle = '#CCCC09';
       else e.fillStyle = '#282828';
       e.render();
     });
