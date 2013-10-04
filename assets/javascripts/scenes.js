@@ -102,6 +102,7 @@ function SnakeScene (opts) {
   this.name = "Snake";
   this.initialized = false;
   this.id = (opts.id) ? opts.id : 0;
+  this.isArcadeMode = true; // NOT GONNA ALWAYS BE TRUE IN THE FUTURE
   this.score = (opts.score) ? opts.score : 0;
   this.maxScore = (opts.score) ? opts.score : 50;
   this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
@@ -129,16 +130,9 @@ function SnakeScene (opts) {
   };
 
   this.end = function () {
-    if(scores[this.id]){
-      if(this.score > scores[this.id]){
-        score += (this.score - scores[this.id]);
-        scores[this.id] = this.score;
-      }
-    } else {
-      score += scores[this.id] = this.score;
-    }
     document.removeEventListener('keydown', keyHandler);
     this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
+    this.score = 0;
     this.initialized = false;
     cur++;
   };
@@ -152,8 +146,8 @@ function SnakeScene (opts) {
         
         ctx.fillStyle = '#282828';
         ctx.beginPath();
-        ctx.fillText('Score: ' + score, c.width/20, c.height/20);
-        ctx.fillText('High score: ' + highscore, c.width/20, c.height/10);
+        ctx.fillText('This life: ' + this.score, c.width/20, c.height/10);
+        ctx.fillText('Total: ' + score, c.width/20, c.height/20);
         ctx.closePath();
         ctx.fill();
   };
@@ -238,8 +232,11 @@ this.eggSpawn = function () {
         if(!this.entities[0]) return respawn();
         this.entities[1] =  new Block ({ fillStyle: '#CC3A09' }) ;
         this.growSnake();
+        if(this.isArcadeMode) {
+          score++;
+        } 
         this.score++;
-        this.entities[0].loops_to_move = (this.entities[0].loops_to_move)*0.95 //used to be //entities[0].loops_to_move--;
+        this.entities[0].loopsToMove = (this.entities[0].loopsToMove)*0.95 //used to be //entities[0].loops_to_move--;
       };
 
 this.growSnake = function () {
@@ -301,20 +298,40 @@ function TransitionScene (opts, passables) {
 }
 
 function ShopScene (opts) {
-  this.name = "Shop";
+  this.name = "Yopico Shop";
   this.initialized = false;
   this.walletUpdated = true;
   this.spent = (opts.spent !== undefined) ? opts.spent : 0;
   this.entities = [ 
-                    new Text( { type: "Title", text: this.name } ),
+                    new Text( { type: "Title", text: this.name, y: vpheight()/20 } ),
                     new Menu( [
-                                new ShopItem( {  } ), // default item is smooth underbelly (gives faster start)
-                                new ShopItem( { text: "Slow breeze", val: 40, flavorText: "Slows breeze in an area to a balmy calm", id: 1 } ), //gives 1 breeze (slows time)
-                                new ShopItem( { text: "Golden plumes", val: 100, flavorText: "Allows true ouroboros (try leaving the map)", id: 2 } ), //allows map-wrap
-                                new ShopItem( { text: "Aerobody", val: 100, flavorText: "Transforms pieces of the body into raw, elemental, air magic", id: 3 } ), //segments of unit collision avoidance in the body
+                                new ShopItem( { 
+                                  text: Upgrades.SmoothUnderbelly.name, 
+                                  val: Upgrades.SmoothUnderbelly.price, 
+                                  flavorText: Upgrades.SmoothUnderbelly.flavorText,
+                                  id: Upgrades.SmoothUnderbelly.id
+                                } ), // smooth underbelly (gives faster start)
+                                new ShopItem( { 
+                                  text: "Slow breeze", 
+                                  val: 40, 
+                                  flavorText: "Slows breeze in an area to a balmy calm", 
+                                  id: 1 
+                                } ), //gives 1 breeze (slows time)
+                                new ShopItem( { 
+                                  text: "Golden plumes", 
+                                  val: 100, 
+                                  flavorText: "Allows true ouroboros (try leaving the map)", 
+                                  id: 2 
+                                } ), //allows map-wrap
+                                new ShopItem( { 
+                                  text: "Aerobody", 
+                                  val: 100, 
+                                  flavorText: "Transforms pieces of the body into raw, elemental, air magic", 
+                                  id: 3 
+                                } ), //segments of unit collision avoidance in the body
                                 new Text( { type: "MenuItem", text: "Exit shop" } )
-                    ], { } ),
-                    new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: 175 })
+                    ], { x: vpwidth() / 4,y: vpheight() / 5 } ),
+                    new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: vpheight()/10 })
   ];
   
   this.init = function () {
@@ -333,15 +350,35 @@ function ShopScene (opts) {
     if(!this.initialized) this.init();
     if(!this.entities) {
       this.entities = [ 
-                    new Text( { type: "Title", text: this.name } ),
+                    new Text( { type: "Title", text: this.name, y: vpheight()/20 } ),
                     new Menu( [
-                                new ShopItem( {  } ), // default item is smooth underbelly (gives faster start)
-                                new ShopItem( { text: "Slow breeze", val: 40, flavorText: "Slows breeze in an area to a balmy calm", id: 1 } ), //gives 1 breeze (slows time)
-                                new ShopItem( { text: "Golden plumes", val: 100, flavorText: "Allows true ouroboros (try leaving the map)", id: 2 } ), //allows map-wrap
-                                new ShopItem( { text: "Aerobody", val: 100, flavorText: "Transforms pieces of the body into raw, elemental, air magic", id: 3 } ), //segments of unit collision avoidance in the body
+                                new ShopItem( { 
+                                  text: Upgrades.SmoothUnderbelly.name, 
+                                  val: Upgrades.SmoothUnderbelly.price, 
+                                  flavorText: Upgrades.SmoothUnderbelly.flavorText,
+                                  id: Upgrades.SmoothUnderbelly.id
+                                } ), // smooth underbelly (gives faster start)
+                                new ShopItem( { 
+                                  text: "Slow breeze", 
+                                  val: 40, 
+                                  flavorText: "Slows breeze in an area to a balmy calm", 
+                                  id: 1 
+                                } ), //gives 1 breeze (slows time)
+                                new ShopItem( { 
+                                  text: "Golden plumes", 
+                                  val: 100, 
+                                  flavorText: "Allows true ouroboros (try leaving the map)", 
+                                  id: 2 
+                                } ), //allows map-wrap
+                                new ShopItem( { 
+                                  text: "Aerobody", 
+                                  val: 100, 
+                                  flavorText: "Transforms pieces of the body into raw, elemental, air magic", 
+                                  id: 3 
+                                } ), //segments of unit collision avoidance in the body
                                 new Text( { type: "MenuItem", text: "Exit shop" } )
                     ], { } ),
-                    new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: 175 })
+                    new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: vpheight()/20 })
       ];
       return;
     }
@@ -359,6 +396,24 @@ function ShopScene (opts) {
     });
   };
   
+  this.buy = function (i) {
+    if(this.entities[1].items[i].soldOut) return false;
+    for (var u in Upgrades) {
+      if (!Upgrades.hasOwnProperty(u)) continue;
+      if(Upgrades[u].id == i) {
+        upgrades.push(Upgrades[u]);
+        if(Upgrades[u].isUnique) {
+          // TODO: MAKE THIS NOT SHIT
+          this.entities[1].items[i].soldOut = true;
+        }
+      }
+    }
+    
+    this.spent += this.entities[1].items[i].val;
+    this.wallet -= this.entities[1].items[i].val;
+    this.walletUpdated = true;
+  }
+  
   var keyHandler = function (e) {
     var d,
         key = e.which;
@@ -375,10 +430,7 @@ function ShopScene (opts) {
         return;
       }
       if(scenes[cur].entities[1].items[scenes[cur].entities[1].cursor.i].val <= scenes[cur].wallet ) {
-         scenes[cur].spent += scenes[cur].entities[1].items[scenes[cur].entities[1].cursor.i].val;
-         scenes[cur].wallet -= scenes[cur].entities[1].items[scenes[cur].entities[1].cursor.i].val;
-         scenes[cur].walletUpdated = true;
-         upgrades.push(scenes[cur].entities[1].items[scenes[cur].entities[1].cursor.i].id);
+         scenes[cur].buy(scenes[cur].entities[1].cursor.i);
       }
     }
     inputs.push(d);

@@ -22,6 +22,19 @@ Direction = {
   DOWN: 3
 }
 
+function Upgrades () {
+ 
+}
+
+Upgrades.SmoothUnderbelly = {
+   id: 0,
+   name: "Smooth underbelly",
+   price: 10,
+   flavorText: "Lets you start faster. Carpe diem!",
+   isUnique: true, // means you can only buy it once
+   speed: SNAKE_BASE_LOOPS_TO_MOVE * Math.pow(0.95, 10) // moves like you already have a score of 10
+ }; 
+
 function Block (opts) {
   this.x = (opts.x !== undefined) ? opts.x : Math.floor(Math.random() * Math.floor( document.width/BLOCK_WIDTH )), 
   this.y = (opts.y !== undefined) ? opts.y : Math.floor(Math.random() * Math.floor( document.height/BLOCK_HEIGHT )),
@@ -82,14 +95,24 @@ function getDirectionFromWallProximity(b) { //b for block
 function Snake (opts, blockopts) {
   this.blocks = (blockopts) ? [ new Block (blockopts) ] : [ new Block ({ moves: true }) ],
   this.speed = (opts.speed) ? opts.speed : SNAKE_BASE_SPEED,
-  this.loops_to_move = (opts.loops) ? opts.loops : SNAKE_BASE_LOOPS_TO_MOVE,
+  this.loopsToMove = (opts.loops) ? opts.loops : SNAKE_BASE_LOOPS_TO_MOVE,
   this.loops = 0;
   this.tail;
   this.direction = (opts.direction) ? opts.direction : getDirectionFromWallProximity(this.blocks[0]);
   
   this.moves = true;
   this.move = function () {
-    if(++this.loops >= this.loops_to_move) {
+    var loopsToMove = this.loopsToMove;
+    if(loopsToMove > Upgrades.SmoothUnderbelly.speed) {
+      for(var u in upgrades) {
+        if(upgrades[u] === Upgrades.SmoothUnderbelly) {
+          console.log('SmoothUnderbelly active');
+          loopsToMove = Upgrades.SmoothUnderbelly.speed; 
+          break;
+        }
+      }
+    }
+    if(++this.loops >= loopsToMove) {
         for(var x = 0; x < this.speed; x++) {
           this.tail = this.blocks.pop();
           this.tail.x = this.blocks[0].x; this.tail.y = this.blocks[0].y; this.tail.direction = this.blocks[0].direction;
@@ -225,18 +248,20 @@ function Cursor (max, opts) {
 // for when simple text won't cut it
 function ShopItem (opts) {
   this.type = (opts.type) ? opts.type : "MenuItem";
-  this.text = (opts.text) ? opts.text : "Smooth underbelly";
+  this.text = (opts.text) ? opts.text : Upgrades.SmoothUnderbelly.name;
   this.id = (opts.id) ? opts.id : 0;
-  this.val = (opts.val) ? opts.val : 10;
-  this.flavorText = (opts.flavorText) ? opts.flavorText : "Lets you start faster";  
+  this.val = (opts.val) ? opts.val : Upgrades.SmoothUnderbelly.price;
+  this.flavorText = (opts.flavorText) ? opts.flavorText : Upgrades.SmoothUnderbelly.flavorText;  
+  this.soldOut = false;
   
-  this.x = (opts.x !== undefined) ? opts.x : ((vpwidth() / 2) - 130);
+  this.x = (opts.x !== undefined) ? opts.x : ((vpwidth() / 4) - 130);
   this.y = (opts.y !== undefined) ? opts.y : ((vpheight() / 2) - 200);
   this.w = (opts.w !== undefined) ? opts.w : (vpwidth() / 2);
   
   this.fontFamily = "MS Shell DLG, Arial, fantasy";
   this.fillStyle = (opts.fillStyle) ? opts.fillStyle : "#282828";
   this.altFillStyle = (opts.altFillStyle) ? opts.altFillStyle : "#505050";
+  this.soldOutFillStyle = "#885050";
   this.fontSize = "22pt";
   
   this.move = function () {
@@ -247,7 +272,7 @@ function ShopItem (opts) {
   this.render = function () {
     ctx.beginPath();
     ctx.font = this.fontSize + " " + this.fontFamily;
-    ctx.fillStyle = this.fillStyle;
+    ctx.fillStyle = (this.soldOut) ? this.soldOutFillStyle : this.fillStyle;
     ctx.fillText(this.text, this.x, this.y);
     ctx.fillStyle = this.altFillStyle;
     ctx.fillText(this.val, this.x + this.w - 50, this.y);
@@ -286,3 +311,9 @@ function Text (opts) {
     ctx.closePath();
   }
 }
+
+
+
+
+
+
