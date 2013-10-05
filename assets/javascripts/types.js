@@ -12,7 +12,7 @@ var BLOCK_WIDTH = Math.floor(vpwidth() / 60),
     BLOCK_HEIGHT = BLOCK_WIDTH,
     BLOCK_BASE_SPEED = 4,
     SNAKE_BASE_SPEED = 1,
-    SNAKE_BASE_LOOPS_TO_MOVE = 20,
+    SNAKE_BASE_LOOPS_TO_MOVE = 15,
     SNAKE_BASE_LENGTH = 4;
     ARCADE_TIMER_STARTING_MAX = 300; // (in seconds) (hopefully)
 
@@ -50,7 +50,7 @@ Upgrades.StillAir = {
 Upgrades.GoldenPlumes = {
   id: 2,
   name: "Golden plumes",
-  price: 100,
+  price: 30,
   flavorText: "Allows true ouroboros. Try leaving the map to see!",
   isUnique: true
 };
@@ -262,10 +262,11 @@ function Menu (items, opts) {
       e.x += BLOCK_WIDTH;
       e.y += i*this.spacing;
     }
+    if (i == items.length - 1 && e.isQuitOption == true) e.y += this.spacing;
   }, this);
   
   this.render = function () {
-    this.cursor.render(this.x, this.y, this.spacing);
+    this.cursor.render(this.x, this.items[this.cursor.i].y - BLOCK_HEIGHT);
     items.forEach(function (e, i, a) {
       e.render();
     });
@@ -308,10 +309,10 @@ function Cursor (max, opts) {
     d = false;
   };
   
-  this.render = function (x, y, spacing) {
+  this.render = function (x, y) {
     ctx.beginPath();
     ctx.fillStyle = this.fillStyle;
-    ctx.fillRect(x, y + (this.i * spacing) - BLOCK_HEIGHT, this.w, this.h);
+    ctx.fillRect(x, y, this.w, this.h);
     ctx.closePath();
   };
 }
@@ -331,7 +332,7 @@ function ShopItem (opts) {
   
   this.fontFamily = "MS Shell DLG, Arial, fantasy";
   this.fillStyle = (opts.fillStyle) ? opts.fillStyle : "#282828";
-  this.altFillStyle = (opts.altFillStyle) ? opts.altFillStyle : "#505050";
+  this.altFillStyle = (opts.altFillStyle) ? opts.altFillStyle : "#999";
   this.soldOutFillStyle = "#885050";
   this.fontSize = "22pt";
   
@@ -347,6 +348,8 @@ function ShopItem (opts) {
     ctx.fillText(this.text, this.x, this.y);
     ctx.fillStyle = this.altFillStyle;
     ctx.fillText(this.val, this.x + this.w - 50, this.y);
+    ctx.font = "14pt " + this.fontFamily;
+    ctx.fillText(this.flavorText, this.x, this.y + 28);
     ctx.closePath();
   }
 }
@@ -354,6 +357,7 @@ function ShopItem (opts) {
 function Text (opts) {
   this.type = (opts.type) ? opts.type : "Title";
   this.text = (opts.text) ? opts.text : "OUROBOROS";
+  this.isQuitOption = (opts.isQuitOption) ? opts.isQuitOption : false;
   
   this.x = (opts.x) ? opts.x : ((vpwidth() / 2) - 130);
   this.y = (opts.y) ? opts.y : ((vpheight() / 2) - 200);

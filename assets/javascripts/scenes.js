@@ -356,7 +356,7 @@ function ShopScene (opts) {
                                     flavorText: Upgrades.TimeExtension.flavorText,
                                     id: Upgrades.TimeExtension.id
                                 } ), //+30s
-                                new Text( { type: "MenuItem", text: "Exit shop" } )
+                                new Text( { type: "MenuItem", text: "Exit shop", isQuitOption: true } )
                     ], { x: vpwidth() / 4,y: vpheight() / 5 } ),
                     new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: vpheight()/10 })
   ];
