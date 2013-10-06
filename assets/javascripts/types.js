@@ -255,6 +255,8 @@ function Menu (items, opts) {
   this.y = (opts.y) ? opts.y : (vpheight() - 400);
   this.cursor = new Cursor ( items.length - 1, { } )
   
+  while(this.items[this.cursor.i].isCursorable !== undefined && !this.items[this.cursor.i].isCursorable) this.cursor.i++;
+  
   items.forEach(function (e, i, a) {
     e.x = this.x;
     e.y = this.y;
@@ -273,7 +275,11 @@ function Menu (items, opts) {
   }
   
   this.move = function () {
-    this.cursor.move();
+    var d = this.cursor.move();
+    if(this.items[this.cursor.i].isCursorable !== undefined && !this.items[this.cursor.i].isCursorable) {
+      inputs.push(d);
+      this.cursor.move();
+    }
     items.forEach(function (e, i, a) {
       e.move();
     });
@@ -306,7 +312,7 @@ function Cursor (max, opts) {
           break;
       }
     }
-    d = false;
+    return d;
   };
   
   this.render = function (x, y) {
@@ -357,7 +363,9 @@ function ShopItem (opts) {
 function Text (opts) {
   this.type = (opts.type) ? opts.type : "Title";
   this.text = (opts.text) ? opts.text : "OUROBOROS";
+  
   this.isQuitOption = (opts.isQuitOption) ? opts.isQuitOption : false;
+  this.isCursorable = (opts.isCursorable !== undefined) ? opts.isCursorable : true;
   
   this.x = (opts.x) ? opts.x : ((vpwidth() / 2) - 130);
   this.y = (opts.y) ? opts.y : ((vpheight() / 2) - 200);

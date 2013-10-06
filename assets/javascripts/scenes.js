@@ -326,18 +326,34 @@ function ShopScene (opts) {
   this.entities = [ 
                     new Text( { type: "Title", text: this.name, y: vpheight()/20 } ),
                     new Menu( [
-                                new ShopItem( { 
-                                  text: Upgrades.SmoothUnderbelly.name, 
-                                  val: Upgrades.SmoothUnderbelly.price, 
-                                  flavorText: Upgrades.SmoothUnderbelly.flavorText,
-                                  id: Upgrades.SmoothUnderbelly.id
-                                } ), // smooth underbelly (gives faster start)
+                                new Text( {
+                                  type: "MenuItem",
+                                  text: "Consumables: ",
+                                  isCursorable: false
+                                } ),
+                                new ShopItem( {
+                                    text: Upgrades.TimeExtension.name,
+                                    val: Upgrades.TimeExtension.price,
+                                    flavorText: Upgrades.TimeExtension.flavorText,
+                                    id: Upgrades.TimeExtension.id
+                                } ), //+30s
                                 new ShopItem( { 
                                   text: Upgrades.StillAir.name, 
                                   val: Upgrades.StillAir.price, 
                                   flavorText: Upgrades.StillAir.flavorText, 
                                   id: Upgrades.StillAir.id
                                 } ), //gives 1 breeze (slows time)
+                                new Text( {
+                                  type: "MenuItem",
+                                  text: "Upgrades: ",
+                                  isCursorable: false
+                                } ),
+                                new ShopItem( { 
+                                  text: Upgrades.SmoothUnderbelly.name, 
+                                  val: Upgrades.SmoothUnderbelly.price, 
+                                  flavorText: Upgrades.SmoothUnderbelly.flavorText,
+                                  id: Upgrades.SmoothUnderbelly.id
+                                } ), // smooth underbelly (gives faster start)
                                 new ShopItem( { 
                                   text: Upgrades.GoldenPlumes.name,
                                   val: Upgrades.GoldenPlumes.price, 
@@ -350,12 +366,6 @@ function ShopScene (opts) {
                                   flavorText: Upgrades.Aerobody.flavorText, 
                                   id: Upgrades.Aerobody.id
                                 } ), //segments of unit collision avoidance in the body
-                                new ShopItem( {
-                                    text: Upgrades.TimeExtension.name,
-                                    val: Upgrades.TimeExtension.price,
-                                    flavorText: Upgrades.TimeExtension.flavorText,
-                                    id: Upgrades.TimeExtension.id
-                                } ), //+30s
                                 new Text( { type: "MenuItem", text: "Exit shop", isQuitOption: true } )
                     ], { x: vpwidth() / 4,y: vpheight() / 5 } ),
                     new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: vpheight()/10 })
