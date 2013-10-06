@@ -58,16 +58,16 @@ Upgrades.GoldenPlumes = {
 Upgrades.Aerobody = {
   id: 3,
   name: "Aerobody",
-  price: 100,
-  flavorText: "Transforms pieces of the body into raw, elemental, air magic.",
+  price: 30,
+  flavorText: "Transforms pieces of your body into raw, elemental, air magic.",
   isUnique: true
 }
 
 Upgrades.TimeExtension = {
   id: 4,
-  name: "+30s",
+  name: "Time extension",
   price: 10,
-  flavorText: "",
+  flavorText: "Adds 30s to the timer.",
   isUnique: false
 }
 
@@ -211,9 +211,10 @@ function Snake (opts, blockopts) {
   this.render = function () {
     this.blocks.forEach(function(e, i, a) {
       if(i == 0 && hasUpgrade(Upgrades.GoldenPlumes)) e.fillStyle = '#CCCC09';
+      if((i > (this.blocks.length - 1)/4 && i < (this.blocks.length - 1)*3/4) && hasUpgrade(Upgrades.Aerobody)) e.fillStyle = '#eee';
       else e.fillStyle = '#282828';
       e.render();
-    });
+    }, this);
   }
   
   var size = (opts.size) ? opts.size : SNAKE_BASE_LENGTH,
@@ -260,7 +261,7 @@ function Menu (items, opts) {
   items.forEach(function (e, i, a) {
     e.x = this.x;
     e.y = this.y;
-    if(e.type === "MenuItem" || typeof e === "MenuItem") {
+    if(e.type === "MenuItem") {
       e.x += BLOCK_WIDTH;
       e.y += i*this.spacing;
     }

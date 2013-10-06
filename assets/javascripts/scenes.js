@@ -124,6 +124,8 @@ function SnakeScene (opts) {
           return;
         }
     
+        if(hasUpgrade(Upgrades.Aerobody)) this.makeBodyAllAiryAndStuff();
+    
         if(this.score >= this.maxScore) {
           this.score = this.maxScore; //just in case someone cheated!
           return this.end();
@@ -138,9 +140,13 @@ function SnakeScene (opts) {
         return this.move();
   };
 
-  this.loopMove = function () {
-    
-  };
+  this.makeBodyAllAiryAndStuff = function () {
+   this.entities[0].blocks.forEach(function (e, i, a) {
+     if(i > (this.entities[0].blocks.length - 1)/4 && i < (this.entities[0].blocks.length - 1)*3/4)
+       e.isTransparent = true;
+     else e.isTransparent = false;
+   }, this);
+  }
   
   this.end = function () {
     document.removeEventListener('keydown', keyHandler);
@@ -201,12 +207,27 @@ function SnakeScene (opts) {
         if(!this.entities) return false;
         if(!this.entities[0].blocks[0]) return false;
       
+        if(hasUpgrade(Upgrades.Aerobody)) {
+          var head,
+              ret = false;
+          
+          this.entities[0].blocks.some(function (e, i, a) {
+            if(!head) { head = e; }
+            else if(e.hasOwnProperty('isTransparent') && e.isTransparent) { }
+            else if(Math.sqrt(Math.pow(head.x - e.x, 2) + Math.pow(head.y - e.y, 2)) < 1) return (ret = true);
+          });
+      
+          return ret;
+        }
+    
+    
         var head,
             ret = false;
         this.entities[0].blocks.some(function (e, i, a) {
           if(!head) { head = e; }
           else if(Math.sqrt(Math.pow(head.x - e.x, 2) + Math.pow(head.y - e.y, 2)) < 1) return (ret = true);
         });
+    
         return ret;
       };
       
