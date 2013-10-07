@@ -15,7 +15,7 @@ function StartScene(opts) {
         new Menu([
             new Text({ type: 'MenuItem', text: 'New Game (coming soon!)' }),
             new Text({ type: 'MenuItem', text: 'Continue (coming soon!)' }),
-            new Text({ type: 'MenuItem', text: 'Arcade Mode' })
+            new Text({ type: 'MenuItem', text: 'Time Attack' })
         ],
             { }
                 )
