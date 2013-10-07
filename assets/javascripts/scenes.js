@@ -216,15 +216,35 @@ function SnakeScene (opts) {
             else if(e.hasOwnProperty('isTransparent') && e.isTransparent) { }
             else if(Math.sqrt(Math.pow(head.x - e.x, 2) + Math.pow(head.y - e.y, 2)) < 1) return (ret = true);
           });
-      
+          
+          if(ret) return ret;
+          
+          
+          head = 0;
+          var ix;
+          for(ix = 0; ix < this.entities[0].blocks.length; ix++){
+            if(head) break;
+            // if the last block was transparent, but this one isn't, count it as the second head
+            if(this.entities[0].blocks[ix-1] && this.entities[0].blocks[ix-1].isTransparent && !this.entities[0].blocks[ix].isTransparent) {
+              head = this.entities[0].blocks[ix];
+              break;
+            }
+          }
+          
+          this.entities[0].blocks.some(function (e, i, a) {
+            if(ix == i) { }
+            else if(!head) { head = e; }
+            else if(e.hasOwnProperty('isTransparent') && e.isTransparent) { }
+            else if(Math.sqrt(Math.pow(head.x - e.x, 2) + Math.pow(head.y - e.y, 2)) < 1) { return (ret = true); }
+          });
           return ret;
         }
-    
     
         var head,
             ret = false;
         this.entities[0].blocks.some(function (e, i, a) {
           if(!head) { head = e; }
+          else if(e.hasOwnProperty('isTransparent') && e.isTransparent) { }
           else if(Math.sqrt(Math.pow(head.x - e.x, 2) + Math.pow(head.y - e.y, 2)) < 1) return (ret = true);
         });
     

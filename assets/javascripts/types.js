@@ -211,7 +211,7 @@ function Snake (opts, blockopts) {
   this.render = function () {
     this.blocks.forEach(function(e, i, a) {
       if(i == 0 && hasUpgrade(Upgrades.GoldenPlumes)) e.fillStyle = '#CCCC09';
-      if((i > (this.blocks.length - 1)/4 && i < (this.blocks.length - 1)*3/4) && hasUpgrade(Upgrades.Aerobody)) e.fillStyle = '#eee';
+      else if((i > (this.blocks.length - 1)/4 && i < (this.blocks.length - 1)*3/4) && hasUpgrade(Upgrades.Aerobody)) e.fillStyle = '#eee';
       else e.fillStyle = '#282828';
       e.render();
     }, this);
