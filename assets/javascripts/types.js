@@ -14,7 +14,7 @@ var BLOCK_WIDTH = Math.floor(vpwidth() / 60),
     SNAKE_BASE_SPEED = 1,
     SNAKE_BASE_LOOPS_TO_MOVE = 15,
     SNAKE_BASE_LENGTH = 4;
-    ARCADE_TIMER_STARTING_MAX = 300; // (in seconds) (hopefully)
+    ARCADE_TIMER_STARTING_MAX = 30; // (in seconds) (hopefully)
 
 Direction = {
   LEFT: 0,
@@ -40,7 +40,7 @@ Upgrades.SmoothUnderbelly = {
 Upgrades.StillAir = {
   id: 1,
   name: "Still air",
-  price: 40,
+  price: 5,
   flavorText: "Slows down everything in an area to a balmy calm. Consumable.",
   isUnique: false
 };
@@ -50,7 +50,7 @@ Upgrades.StillAir = {
 Upgrades.GoldenPlumes = {
   id: 2,
   name: "Golden plumes",
-  price: 30,
+  price: 20,
   flavorText: "Allows true ouroboros. Try leaving the map to see!",
   isUnique: true
 };
@@ -58,18 +58,18 @@ Upgrades.GoldenPlumes = {
 Upgrades.Aerobody = {
   id: 3,
   name: "Aerobody",
-  price: 30,
+  price: 20,
   flavorText: "Transforms pieces of your body into raw, elemental, air magic.",
   isUnique: true
 }
 
-Upgrades.TimeExtension = {
+/*Upgrades.TimeExtension = {
   id: 4,
   name: "Time extension",
   price: 10,
   flavorText: "Adds 30s to the timer.",
   isUnique: false
-}
+}*/
 
 function Block (opts) {
   this.x = (opts.x !== undefined) ? opts.x : Math.floor(Math.random() * Math.floor( document.width/BLOCK_WIDTH )), 

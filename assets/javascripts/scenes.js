@@ -26,6 +26,7 @@ function StartScene(opts) {
     };
   
     this.logic = (opts.logic) ? opts.logic : function () {
+        console.log(this.initialized);
         if (!this.initialized) this.init();
         if (!this.entities) {
           this.entities = [ 
@@ -33,7 +34,7 @@ function StartScene(opts) {
                             new Menu([
                               new Text({ type: 'MenuItem', text: 'New Game' }),
                               new Text({ type: 'MenuItem', text: 'Continue' }),
-                              new Text({ type: 'MenuItem', text: 'Arcade Mode' })
+                              new Text({ type: 'MenuItem', text: 'Time Attack' })
                             ], { })
                           ];
           return;
@@ -68,6 +69,7 @@ function StartScene(opts) {
     else if (key == '13') {
       switch(scenes[cur].entities[1].cursor.i){ 
           case 2:
+            scenes[cur].initialized = false;
             cur++;
             document.removeEventListener('keydown', keyHandler);
             return;
@@ -296,6 +298,7 @@ this.eggSpawn = function () {
         this.growSnake();
         if(this.isArcadeMode) {
           score++;
+          arcadeTimeLimit += 3;
         } 
         this.score++;
         this.entities[0].loopsToMove = (this.entities[0].loopsToMove)*0.95 //used to be //entities[0].loops_to_move--;
@@ -340,6 +343,11 @@ this.growSnake = function () {
     else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '27' || key == '80') pause();
+    else if (key == '81' && paused) {
+      scenes[cur].end();
+      cur = 0;
+      pause();
+    }
     inputs.push(d);
   };
 }
@@ -372,12 +380,12 @@ function ShopScene (opts) {
                                   text: "Consumables: ",
                                   isCursorable: false
                                 } ),
-                                new ShopItem( {
+                                /*new ShopItem( {
                                     text: Upgrades.TimeExtension.name,
                                     val: Upgrades.TimeExtension.price,
                                     flavorText: Upgrades.TimeExtension.flavorText,
                                     id: Upgrades.TimeExtension.id
-                                } ), //+30s
+                                } ), //+30s*/
                                 new ShopItem( { 
                                   text: Upgrades.StillAir.name, 
                                   val: Upgrades.StillAir.price, 
@@ -454,12 +462,12 @@ function ShopScene (opts) {
                                   flavorText: Upgrades.Aerobody.flavorText, 
                                   id: Upgrades.Aerobody.id
                                 } ), //segments of unit collision avoidance in the body
-                                new ShopItem( {
+                                /*new ShopItem( {
                                     text: Upgrades.TimeExtension.name,
                                     val: Upgrades.TimeExtension.price,
                                     flavorText: Upgrades.TimeExtension.flavorText,
                                     id: Upgrades.TimeExtension.id
-                                } ), //+30s
+                                } ), //+30s*/
                                 new Text( { type: "MenuItem", text: "Exit shop" } )
                     ], { x: vpwidth() / 4,y: vpheight() / 5 } ),
                     new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: vpheight()/20 })
