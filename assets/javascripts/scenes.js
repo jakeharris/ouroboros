@@ -26,7 +26,6 @@ function StartScene(opts) {
     };
   
     this.logic = (opts.logic) ? opts.logic : function () {
-        console.log(this.initialized);
         if (!this.initialized) this.init();
         if (!this.entities) {
           this.entities = [ 
@@ -109,15 +108,27 @@ function SnakeScene (opts) {
   this.score = (opts.score) ? opts.score : 0;
   this.maxScore = (opts.score) ? opts.score : 50;
   this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
+  this.slowMo = false;
+  this.slowMoTimerActive = false;
   arcadeTimeLimit = ARCADE_TIMER_STARTING_MAX;
+  
+  var arcadeModeTimerHandler = function () {
+        arcadeTimer++;
+        scenes[cur].entities.forEach(function (e, i, a) {
+            if(i < 2) return;
+            if(!e.hasOwnProperty('lifeTime') || !e.hasOwnProperty('duration')) return;
+            e.lifeTime++;
+        });
+  };
   
   this.init = function () {
     document.addEventListener('keydown', keyHandler);
     if(this.isArcadeMode) {
-      arcadeTimeLooper = setInterval(function () { arcadeTimer++; }, 1000); 
+      arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 1000); 
     }
     this.initialized = true;
   }
+  
   
   this.logic = (opts.logic) ? opts.logic : function () {
         if(!this.initialized) this.init();
@@ -127,6 +138,33 @@ function SnakeScene (opts) {
         }
     
         if(hasUpgrade(Upgrades.Aerobody)) this.makeBodyAllAiryAndStuff();
+    
+        if(this.entities.length > 2) { 
+          this.entities.forEach(function (e, i, a) {
+            if(i < 2) return;
+            if(!e.hasOwnProperty('lifeTime') || !e.hasOwnProperty('duration')) return;
+            if(e.lifeTime >= e.duration) { a.splice(i, 1); return; }
+            
+            if (this.slowMo && i > 2) { return; }
+            console.log('Math: ' + (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < e.r));
+            console.log('a^2 (x): ' + (Math.pow(e.x - a[0].blocks[0].x, 2)));
+            console.log('b^2 (y): ' + (Math.pow(e.y - a[0].blocks[0].y, 2)));
+            console.log('c^2 (z): ' + (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2))));
+            console.log('r: ' + (e.r / BLOCK_WIDTH));
+            this.slowMo = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < Math.sqrt(e.r / BLOCK_WIDTH))
+          }, this);
+        } else this.slowMo = false;
+        
+        if(this.slowMo && !this.slowMoTimerActive) { 
+          alert('slow timer'); 
+          clearInterval(arcadeModeTimerHandler); 
+          arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 4000); 
+          this.slowMoTimerActive = true; 
+        }
+        else if (this.slowMoTimerActive) { 
+          arcadeModeTimerHandler = clearInterval(arcadeModeTimerHandler); 
+          arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 1000); 
+        }
     
         if(this.score >= this.maxScore) {
           this.score = this.maxScore; //just in case someone cheated!
@@ -152,7 +190,11 @@ function SnakeScene (opts) {
   
   this.end = function () {
     document.removeEventListener('keydown', keyHandler);
-    if(this.isArcadeMode) arcadeTimeLooper = clearInterval(arcadeTimeLooper);
+    if(this.isArcadeMode) {
+      arcadeTimeLooper = clearInterval(arcadeTimeLooper);
+      arcadeTimeLimit = ARCADE_TIMER_STARTING_MAX;
+      arcadeTimer = 0;
+    }
     this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
     this.score = 0;
     this.initialized = false;
@@ -163,9 +205,12 @@ function SnakeScene (opts) {
         if(!this.entities) return;
     
         this.entities.forEach(function (e, i, a) {  
+          if(i == 0) return;
           e.render();
         });
         
+        this.entities[0].render();
+    
         ctx.fillStyle = '#282828';
         ctx.beginPath();
         ctx.fillText('This life: ' + this.score, c.width/20, c.height/10);
@@ -334,6 +379,16 @@ this.growSnake = function () {
         snakeBlocks.push(block);
         this.entities[0].blocks = snakeBlocks;
       };
+  
+  this.spawnStillZone = function () {
+        if(!this.entities) return false;
+        if(!this.entities[0]) return false;
+        if(!this.entities[1]) return false;
+    
+        upgrades.splice(upgrades.indexOf(Upgrades.StillAir), 1);
+        this.entities.push(new StillZone(this.entities[0].blocks[0].x, this.entities[0].blocks[0].y, { }))
+  };
+  
   var keyHandler = function (e) {
     var d = scenes[cur].entities[0].direction,
         key = e.which;
@@ -342,6 +397,7 @@ this.growSnake = function () {
     else if (key == '38' && d != Direction.DOWN)  d = Direction.UP;
     else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
+    else if (key == '32' && hasUpgrade(Upgrades.StillAir)) scenes[cur].spawnStillZone(); 
     else if (key == '27' || key == '80') pause();
     else if (key == '81' && paused) {
       scenes[cur].end();

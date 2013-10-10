@@ -13,8 +13,10 @@ var BLOCK_WIDTH = Math.floor(vpwidth() / 60),
     BLOCK_BASE_SPEED = 4,
     SNAKE_BASE_SPEED = 1,
     SNAKE_BASE_LOOPS_TO_MOVE = 15,
-    SNAKE_BASE_LENGTH = 4;
-    ARCADE_TIMER_STARTING_MAX = 30; // (in seconds) (hopefully)
+    SNAKE_BASE_LENGTH = 4,
+    ARCADE_TIMER_STARTING_MAX = 30, // (in seconds) (hopefully)
+    STILLZONE_BASE_RADIUS = 6,
+    STILLZONE_BASE_DURATION = 3; 
 
 Direction = {
   LEFT: 0,
@@ -183,6 +185,7 @@ function Snake (opts, blockopts) {
           loopsToMove = Upgrades.SmoothUnderbelly.speed; 
       }
     }
+    if(scenes[cur].slowMo) loopsToMove = SNAKE_BASE_LOOPS_TO_MOVE*4;
     if(++this.loops >= loopsToMove) {
         for(var x = 0; x < this.speed; x++) {
           this.tail = this.blocks.pop();
@@ -396,7 +399,32 @@ function Text (opts) {
   }
 }
 
-
+function StillZone (x, y, opts) {  
+  this.fillStyle = '#44B8FC'; //this is one of the colors in the Magic Man's hatband (Adventure Time)
+  this.moves = true;
+  
+  this.x = x;
+  this.y = y;
+  
+  this.r = (opts.r) ? opts.r : STILLZONE_BASE_RADIUS;
+  
+  this.duration = (opts.duration) ? opts.duration : STILLZONE_BASE_DURATION;
+  this.lifeTime = 0;
+  
+  this.move = function () {
+     if(this.r < STILLZONE_BASE_RADIUS*BLOCK_WIDTH) this.r++;
+    return;
+  };
+  
+  this.render = function () {
+     ctx.beginPath();
+     ctx.fillStyle = this.fillStyle;
+     ctx.arc(this.x*BLOCK_WIDTH, this.y*BLOCK_HEIGHT, this.r, 0, 2*Math.PI);
+     ctx.fill();
+     ctx.closePath();
+  };
+  
+}
 
 
 

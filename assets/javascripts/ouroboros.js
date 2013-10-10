@@ -83,11 +83,11 @@ var pause = function () {
         renderPause();
         if(!paused) {
           game = clearTimeout(game);
-          arcadeTimeLooper = clearInterval(arcadeTimeLooper);
+          if(scenes[1].isArcadeMode) arcadeTimeLooper = clearInterval(arcadeTimeLooper);
           paused = true;
         } else {
           game = setTimeout(loop, 10);
-          arcadeTimeLooper = setInterval(function () { arcadeTimer++; }, 1000);
+          if(scenes[1].isArcadeMode) arcadeTimeLooper = setInterval(scenes[1].arcadeModeTimerHandler, 1000);
           paused = false;
         }
 }
