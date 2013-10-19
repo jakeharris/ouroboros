@@ -120,6 +120,7 @@ function SnakeScene (opts) {
             e.lifeTime++;
         });
   };
+  this.arcadeModeTimerHandler = arcadeModeTimerHandler;
   
   this.init = function () {
     document.addEventListener('keydown', keyHandler);
@@ -146,23 +147,18 @@ function SnakeScene (opts) {
             if(e.lifeTime >= e.duration) { a.splice(i, 1); return; }
             
             if (this.slowMo && i > 2) { return; }
-            console.log('Math: ' + (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < e.r));
-            console.log('a^2 (x): ' + (Math.pow(e.x - a[0].blocks[0].x, 2)));
-            console.log('b^2 (y): ' + (Math.pow(e.y - a[0].blocks[0].y, 2)));
-            console.log('c^2 (z): ' + (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2))));
-            console.log('r: ' + (e.r / BLOCK_WIDTH));
             this.slowMo = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < Math.sqrt(e.r / BLOCK_WIDTH))
           }, this);
         } else this.slowMo = false;
         
         if(this.slowMo && !this.slowMoTimerActive) { 
-          alert('slow timer'); 
-          clearInterval(arcadeModeTimerHandler); 
+          clearInterval(arcadeTimeLooper); 
+          console.log(arcadeTimeLooper);
           arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 4000); 
           this.slowMoTimerActive = true; 
         }
         else if (this.slowMoTimerActive) { 
-          arcadeModeTimerHandler = clearInterval(arcadeModeTimerHandler); 
+          clearInterval(arcadeTimeLooper); 
           arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 1000); 
         }
     
@@ -191,7 +187,7 @@ function SnakeScene (opts) {
   this.end = function () {
     document.removeEventListener('keydown', keyHandler);
     if(this.isArcadeMode) {
-      arcadeTimeLooper = clearInterval(arcadeTimeLooper);
+      clearInterval(arcadeTimeLooper);
       arcadeTimeLimit = ARCADE_TIMER_STARTING_MAX;
       arcadeTimer = 0;
     }
