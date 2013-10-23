@@ -87,7 +87,7 @@ var pause = function () {
           paused = true;
         } else {
           game = setTimeout(loop, 10);
-          if(scenes[cur].isArcadeMode) { alert(scenes[cur].arcadeModeTimerHandler); arcadeTimeLooper = setInterval(scenes[cur].arcadeModeTimerHandler, 1000); }
+          if(scenes[cur].isArcadeMode) { arcadeTimeLooper = setInterval(scenes[cur].arcadeModeTimerHandler, 1000); }
           paused = false;
         }
 }
