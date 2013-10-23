@@ -114,12 +114,15 @@ function SnakeScene (opts) {
   
   var arcadeModeTimerHandler = function () {
         arcadeTimer++;
+  };
+  var slowMoHandler = function () {
         scenes[cur].entities.forEach(function (e, i, a) {
             if(i < 2) return;
             if(!e.hasOwnProperty('lifeTime') || !e.hasOwnProperty('duration')) return;
             e.lifeTime++;
-        });
-  };
+        }, this);
+  }
+  
   this.arcadeModeTimerHandler = arcadeModeTimerHandler;
   
   this.init = function () {
@@ -147,19 +150,23 @@ function SnakeScene (opts) {
             if(e.lifeTime >= e.duration) { a.splice(i, 1); return; }
             
             if (this.slowMo && i > 2) { return; }
+            
             this.slowMo = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < Math.sqrt(e.r / BLOCK_WIDTH))
           }, this);
         } else this.slowMo = false;
         
         if(this.slowMo && !this.slowMoTimerActive) { 
           clearInterval(arcadeTimeLooper); 
-          console.log(arcadeTimeLooper);
-          arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 4000); 
+          arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 3000);
+          slowMoLooper = setInterval(slowMoHandler, 1000);
+          slowMoHandler();
           this.slowMoTimerActive = true; 
         }
-        else if (this.slowMoTimerActive) { 
+        else if (!this.slowMo && this.slowMoTimerActive) { 
           clearInterval(arcadeTimeLooper); 
           arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 1000); 
+          clearInterval(slowMoLooper);
+          this.slowMoTimerActive = false;
         }
     
         if(this.score >= this.maxScore) {
@@ -188,8 +195,6 @@ function SnakeScene (opts) {
     document.removeEventListener('keydown', keyHandler);
     if(this.isArcadeMode) {
       clearInterval(arcadeTimeLooper);
-      arcadeTimeLimit = ARCADE_TIMER_STARTING_MAX;
-      arcadeTimer = 0;
     }
     this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
     this.score = 0;
