@@ -5,6 +5,12 @@
    The different sections of the game.
  
  */
+TimeAttackScenes = {
+  MAINMENU: 0,
+  SNAKE: 1,
+  SHOP: 2,
+  GAMEOVER: 3
+}
 
 function StartScene(opts) {
     "use strict";
@@ -58,7 +64,7 @@ function StartScene(opts) {
   };
   
   var keyHandler = function (e) {
-    var d = scenes[cur].entities[0].direction,
+    var d = scenes[0].entities[0].direction,
         key = e.which;
     
     if      (key == '37' && d != Direction.RIGHT) d = Direction.LEFT;
@@ -66,10 +72,10 @@ function StartScene(opts) {
     else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '13') {
-      switch(scenes[cur].entities[1].cursor.i){ 
+      switch(scenes[0].entities[1].cursor.i){ 
           case 2:
-            scenes[cur].initialized = false;
-            cur++;
+            scenes[0].initialized = false;
+            cur = TimeAttackScenes.SNAKE;
             document.removeEventListener('keydown', keyHandler);
             return;
           case 0:
@@ -116,7 +122,7 @@ function SnakeScene (opts) {
         arcadeTimer++;
   };
   var slowMoHandler = function () {
-        scenes[cur].entities.forEach(function (e, i, a) {
+        scenes[TimeAttackScenes.SNAKE].entities.forEach(function (e, i, a) {
             if(i < 2) return;
             if(!e.hasOwnProperty('lifeTime') || !e.hasOwnProperty('duration')) return;
             e.lifeTime++;
@@ -197,9 +203,10 @@ function SnakeScene (opts) {
       clearInterval(arcadeTimeLooper);
     }
     this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
+    if(highscore < this.score) highscore = this.score;
     this.score = 0;
     this.initialized = false;
-    cur++;
+    cur = (this.timeIsUp()) ? TimeAttackScenes.GAMEOVER : TimeAttackScenes.SHOP;
   };
   
   this.render = (opts.render) ? opts.render : function () {
@@ -395,17 +402,17 @@ this.growSnake = function () {
   };
   
   var keyHandler = function (e) {
-    var d = scenes[cur].entities[0].direction,
+    var d = scenes[TimeAttackScenes.SNAKE].entities[0].direction,
         key = e.which;
     
     if      (key == '37' && d != Direction.RIGHT) d = Direction.LEFT;
     else if (key == '38' && d != Direction.DOWN)  d = Direction.UP;
     else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
-    else if (key == '32' && hasUpgrade(Upgrades.StillAir)) scenes[cur].spawnStillZone(); 
+    else if (key == '32' && hasUpgrade(Upgrades.StillAir)) scenes[TimeAttackScenes.SNAKE].spawnStillZone(); 
     else if (key == '27' || key == '80') pause();
     else if (key == '81' && paused) {
-      scenes[cur].end();
+      scenes[TimeAttackScenes.SNAKE].end();
       cur = 0;
       pause();
     }
@@ -575,17 +582,82 @@ function ShopScene (opts) {
     else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '13'){
-      if(scenes[cur].entities[1].cursor.i == scenes[cur].entities[1].items.length - 1) {
-        scenes[cur].initialized = false;
+      if(scenes[TimeAttackScenes.SHOP].entities[1].cursor.i == scenes[TimeAttackScenes.SHOP].entities[1].items.length - 1) {
+        scenes[TimeAttackScenes.SHOP].initialized = false;
         document.removeEventListener('keydown', keyHandler);
-        cur--;
+        cur = TimeAttackScenes.SNAKE;
         return;
       }
-      if(scenes[cur].entities[1].items[scenes[cur].entities[1].cursor.i].val <= scenes[cur].wallet ) {
-         scenes[cur].buy(scenes[cur].entities[1].cursor.i);
+      if(scenes[TimeAttackScenes.SHOP].entities[1].items[scenes[TimeAttackScenes.SHOP].entities[1].cursor.i].val <= scenes[TimeAttackScenes.SHOP].wallet ) {
+         scenes[TimeAttackScenes.SHOP].buy(scenes[TimeAttackScenes.SHOP].entities[1].cursor.i);
       }
     }
     inputs.push(d);
   };
   
+}
+
+function TimeAttackEndScene (opts) {
+  this.name = "Game Over";
+  this.initialized = false;
+  this.entities = [ 
+                    new Text( { type: "Title", text: this.name, y: vpheight()/20 } ),
+                    new Menu( [
+                                new Text( { type: "MenuItem", text: "Retry" } ), 
+                                new Text( { type: "MenuItem", text: "Quit" } )
+                              ], 
+                             { x: vpwidth() / 4,y: vpheight() / 5 } ),
+                    new Text( { type: "Subtitle", text: "Score: " + score, y: vpheight()/10 })
+      ];
+  
+  this.init = function () {
+    this.initialized = true;
+    //do things
+    document.addEventListener('keydown', keyHandler);
+  }
+  
+  this.render = function () {
+    this.entities.forEach(function (e, i, a) {
+      e.render();
+    });
+  }
+  
+  this.move = function () {
+    this.entities.forEach(function (e, i, a) {
+      e.move();
+    });
+  }
+  
+  this.logic = function () {
+    if(!this.initialized) this.init();
+    this.entities[2].text = "Score: " + score;
+    return this.move();
+  }
+  var keyHandler = function (e) {
+    var d,
+        key = e.which;
+    
+    if      (key == '37' && d != Direction.RIGHT) d = Direction.LEFT;
+    else if (key == '38' && d != Direction.DOWN)  d = Direction.UP;
+    else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
+    else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
+    else if (key == '13'){
+      arcadeTimer = 0;
+      arcadeTimeLimit = 30;
+      score = 0;
+      scenes[TimeAttackScenes.GAMEOVER].initialized = false;
+      document.removeEventListener('keydown', keyHandler);
+      switch(scenes[TimeAttackScenes.GAMEOVER].entities[1].cursor.i) {
+        case 0:
+          cur = TimeAttackScenes.SNAKE;
+          break;
+        case 1:
+          cur = TimeAttackScenes.MAINMENU;
+          break;
+        default:
+          break;
+      }      
+    }
+    inputs.push(d);
+  }
 }
