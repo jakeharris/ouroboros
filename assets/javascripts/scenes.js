@@ -205,12 +205,16 @@ function SnakeScene (opts) {
   this.render = (opts.render) ? opts.render : function () {
         if(!this.entities) return;
     
+    
+        /* Draw any still airs first, since they're further back */
         this.entities.forEach(function (e, i, a) {  
-          if(i == 0) return;
+          if(i <= 1) return;
           e.render();
         });
         
+        /* Draw the snake, then the egg, so the egg is always visible, and the snake is always visible above the still airs. */
         this.entities[0].render();
+        this.entities[1].render();
     
         ctx.fillStyle = '#282828';
         ctx.beginPath();
