@@ -5,6 +5,12 @@
    The different sections of the game.
  
  */
+StartSceneMenuOptions = {
+  CONTINUE: 0,
+  NEWGAME: 1,
+  TIMEATTACK: 2
+}
+
 TimeAttackScenes = {
   MAINMENU: 0,
   SNAKE: 1,
@@ -16,15 +22,16 @@ function StartScene(opts) {
     "use strict";
     this.name = "Start Menu";
     this.initialized = false;
+  
+    var menu = new Menu([
+            new Text({ type: 'MenuItem', text: 'New Game (coming soon!)' }),
+            new Text({ type: 'MenuItem', text: 'Continue (coming soon!)', fillStyle: (docCookies.hasItem('save')) ? '#282828' : '#aaa' }),
+            new Text({ type: 'MenuItem', text: 'Time Attack' })
+        ], { });
+
     this.entities = opts.entities || [
         new Text({ type: 'Title', text: 'OUROBOROS' }),
-        new Menu([
-            new Text({ type: 'MenuItem', text: 'New Game (coming soon!)' }),
-            new Text({ type: 'MenuItem', text: 'Continue (coming soon!)' }),
-            new Text({ type: 'MenuItem', text: 'Time Attack' })
-        ],
-            { }
-                )
+        menu
     ];
     this.init = function () {
         document.addEventListener('keydown', keyHandler);
@@ -73,7 +80,7 @@ function StartScene(opts) {
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '13') {
       switch(scenes[0].entities[1].cursor.i){ 
-          case 2:
+          case StartSceneMenuOptions.TIMEATTACK:
             scenes[0].initialized = false;
             cur = TimeAttackScenes.SNAKE;
             document.removeEventListener('keydown', keyHandler);
@@ -112,6 +119,7 @@ function SnakeScene (opts) {
   this.id = (opts.id) ? opts.id : 0;
   this.isArcadeMode = true; // NOT GONNA ALWAYS BE TRUE IN THE FUTURE
   this.score = (opts.score) ? opts.score : 0;
+  this.highscore = (opts.highscore) ? opts.highscore : 0;
   this.maxScore = (opts.score) ? opts.score : 50;
   this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
   this.slowMo = false;
@@ -134,6 +142,7 @@ function SnakeScene (opts) {
   this.init = function () {
     document.addEventListener('keydown', keyHandler);
     if(this.isArcadeMode) {
+      if(docCookies.hasItem('timeattackscore')) { /* high score on the screen = timeattackscore */ }
       arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 1000); 
     }
     this.initialized = true;
@@ -203,7 +212,11 @@ function SnakeScene (opts) {
       clearInterval(arcadeTimeLooper);
     }
     this.entities = (opts.entities) ? opts.entities : [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
-    if(highscore < this.score) highscore = this.score;
+    /* 
+       if(this.highscore < score) { this.highscore = score; highscore = this.highscore; } 
+       ==== 
+       if (the high score on screen is less than the current total score) the high score = total 
+     */
     this.score = 0;
     this.initialized = false;
     cur = (this.timeIsUp()) ? TimeAttackScenes.GAMEOVER : TimeAttackScenes.SHOP;
@@ -227,6 +240,7 @@ function SnakeScene (opts) {
         ctx.beginPath();
         ctx.fillText('This life: ' + this.score, c.width/20, c.height/10);
         ctx.fillText('Total: ' + score, c.width/20, c.height/20);
+        ctx.fillText('High score: ' + this.highscore, c.width/20, c.height*3/20);
         if(this.isArcadeMode) {
           var minutes = (Math.floor((arcadeTimeLimit - arcadeTimer) / 60)),
               seconds = ((arcadeTimeLimit - arcadeTimer) - Math.floor((arcadeTimeLimit - arcadeTimer) / 60)*60);
@@ -343,7 +357,7 @@ this.move = function () {
 this.respawn = function () {
         if(!this.entities) return false;
         this.entities = [ new Snake({ size: 20 }, { }) ];
-        if(highscore < score) highscore = score;
+        //if(this.highscore < score) this.highscore = score;
         score = 0;
         this.entities[1] =  new Block ({ fillStyle: '#CC3A09' }) ;
       };
@@ -354,7 +368,7 @@ this.eggSpawn = function () {
         this.entities[1] =  new Block ({ fillStyle: '#CC3A09' }) ;
         this.growSnake();
         if(this.isArcadeMode) {
-          score++;
+          if(++score > this.highscore) this.highscore = score;
           arcadeTimeLimit += 3;
         } 
         this.score++;
@@ -413,6 +427,7 @@ this.growSnake = function () {
     else if (key == '27' || key == '80') pause();
     else if (key == '81' && paused) {
       scenes[TimeAttackScenes.SNAKE].end();
+      scenes[TimeAttackScenes.SNAKE].
       cur = 0;
       pause();
     }
@@ -612,6 +627,10 @@ function TimeAttackEndScene (opts) {
   
   this.init = function () {
     this.initialized = true;
+    docCookies.setItem('save', 'true');
+    console.log(highscore);
+    docCookies.setItem('timeattackscore', highscore);
+    upgrades = [ ];
     //do things
     document.addEventListener('keydown', keyHandler);
   }

@@ -80,6 +80,8 @@ function Block (opts) {
   this.height = BLOCK_HEIGHT,
   this.moves = (opts.moves) ? opts.moves : false,
   this.fillStyle = (opts.fillStyle) ? opts.fillStyle : '#282828'; /* must be a color or a gradient or a pattern */
+  this.sprite = new Image();
+  this.sprite.src = 'assets/sprites/block.png';
   
   this.multiplier = 1;
   this.direction = (opts.direction !== undefined) ? opts.direction : Direction.UP;
@@ -117,10 +119,11 @@ function Block (opts) {
   this.render = function () {
           ctx.fillStyle = (this.fillStyle)? this.fillStyle : '#282828';
           ctx.beginPath();
-          ctx.rect((this.x)? this.x*BLOCK_WIDTH : 0,
+          ctx.drawImage(this.sprite, this.x*BLOCK_WIDTH, this.y*BLOCK_HEIGHT);
+         /* ctx.rect((this.x)? this.x*BLOCK_WIDTH : 0,
                    (this.y)? this.y*BLOCK_HEIGHT : 0,
                    (this.width)? BLOCK_WIDTH : 0,
-                   (this.height)? BLOCK_HEIGHT : 0); /* make this handle different shapes, images, etc. */
+                   (this.height)? BLOCK_HEIGHT : 0);  make this handle different shapes, images, etc. */
           ctx.closePath();
           ctx.fill();
           // TODO: WORK IN PROGRESS. ADDS A RED LINE TO ONE SIDE OF THE SNAKE WHEN YOU HAVE THE SMOOTH UNDERBELLY UPGRADE.
