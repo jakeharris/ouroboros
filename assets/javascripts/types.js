@@ -74,14 +74,24 @@ Upgrades.Aerobody = {
 }*/
 
 function Block (opts) {
-  this.x = (opts.x !== undefined) ? opts.x : Math.floor(Math.random() * Math.floor( document.width/BLOCK_WIDTH )), 
-  this.y = (opts.y !== undefined) ? opts.y : Math.floor(Math.random() * Math.floor( document.height/BLOCK_HEIGHT )),
+  
+  console.log('==== block creation ====')
+  console.log(opts)
+  console.log('opts.x is undefined: ' + (opts.x === undefined))
+  console.log('opts.y is undefined: ' + (opts.y === undefined))
+  console.log('generate a random number just for proof of concept: ' + Math.floor(Math.random() * Math.floor( width/BLOCK_WIDTH )));
+  console.log('document: ' + document);
+  console.log('document.width: ' + document.width);
+  console.log('width: ' + width);
+  
+  this.x = (opts !== undefined && opts.x !== undefined) ? opts.x : Math.floor(Math.random() * Math.floor( width/BLOCK_WIDTH ));
+  this.y = (opts !== undefined && opts.y !== undefined) ? opts.y : Math.floor(Math.random() * Math.floor( height/BLOCK_HEIGHT ));    
   this.width = BLOCK_WIDTH,
   this.height = BLOCK_HEIGHT,
   this.moves = (opts.moves) ? opts.moves : false,
   this.fillStyle = (opts.fillStyle) ? opts.fillStyle : '#282828'; /* must be a color or a gradient or a pattern */
   this.sprite = new Image();
-  this.sprite.src = 'assets/sprites/snake-body-03.png';
+  this.sprite.src = 'assets/sprites/snake-body-04.png';
   
   this.multiplier = 1;
   this.direction = (opts.direction !== undefined) ? opts.direction : Direction.UP;
@@ -173,7 +183,7 @@ function getDirectionFromWallProximity(b) { //b for block
 }
 
 function Snake (opts, blockopts) {
-  this.blocks = (blockopts) ? [ new Block (blockopts) ] : [ new Block ({ moves: true }) ],
+  this.blocks = (blockopts !== undefined) ? [ new Block (blockopts) ] : [ new Block ({ moves: true }) ],
   this.speed = (opts.speed) ? opts.speed : SNAKE_BASE_SPEED,
   this.loopsToMove = (opts.loops) ? opts.loops : SNAKE_BASE_LOOPS_TO_MOVE,
   this.loops = 0;
@@ -245,13 +255,18 @@ function Snake (opts, blockopts) {
         break;
   }
   
-  while(this.blocks.length < size) 
+  while(this.blocks.length < size) {
+    console.log('==== snake ====');
+    console.log(this.blocks);
+    console.log('xmod: ' + xmod);
+    console.log('x: ' + this.blocks[this.blocks.length - 1].x + xmod);
     this.blocks.push (new Block( { 
                                   x: this.blocks[this.blocks.length - 1].x + xmod, 
                                   y: this.blocks[this.blocks.length - 1].y + ymod, 
                                   moves: true, 
                                   direction: this.blocks[0].direction
                                 } ));
+  }
   
 }
 
