@@ -21,6 +21,13 @@ function hasUpgrade(p){
   }
   return false;
 }
+function cloneArray(arr) {
+  var tmp = new Array();
+  for(var a in arr) {
+    tmp[a] = arr[a]; 
+  }
+  return tmp;
+}
 
 CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   if (w < 2 * r) r = w / 2;
@@ -34,3 +41,25 @@ CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
   this.closePath();
   return this;
 }
+
+StartSceneMenuOptions = {
+  CONTINUE: 0,
+  NEWGAME: 1,
+  TIMEATTACK: 2
+}
+
+TimeAttackScenes = {
+  MAINMENU: 0,
+  SNAKE: 1,
+  SHOP: 2,
+  GAMEOVER: 3
+}
+
+function EntityInitializationException(message) {
+  this.message = message;
+  this.name = 'EntityInitializationException';
+};
+function SceneInitializationException(message) {
+  this.message = message;
+  this.name = 'SceneInitializationException';
+};

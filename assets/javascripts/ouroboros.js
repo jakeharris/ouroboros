@@ -21,7 +21,7 @@ var width = vpwidth(),
     upgrades = [],
     highscore = 0;
 
-ctx.font = "22pt Arial";
+ctx.font = "22pt Cascada";
 
 var clear = function () {
         width = vpwidth();
