@@ -1,7 +1,7 @@
 function SnakeScene () {
   var name = "Snake";
   var DEFAULT_ENTITIES = [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
-  var keyHandler = function (e) {
+  var handleEvent = function (e) {
     var d = scenes[TimeAttackScenes.SNAKE].entities[0].direction,
         key = e.which;
     
@@ -16,9 +16,9 @@ function SnakeScene () {
       pause();
     }
     inputs.push(d);
-  };
+  }.bind(this);
   
-  Scene.call(this, name, DEFAULT_ENTITIES, keyHandler);
+  Scene.call(this, name, DEFAULT_ENTITIES, handleEvent);
   
   this.logic = function () {
         if(!this.initialized) this.init();
@@ -76,15 +76,10 @@ function SnakeScene () {
   };  
   this.end = function () {
     this.initialized = false;
-    console.log(name + ' scene is ending...');
-    document.removeEventListener(keyHandler);
-    console.log(this.entities);
-    console.log(DEFAULT_ENTITIES);
+    document.removeEventListener('keydown', this.handleEvent);
     this.entities = cloneArray(DEFAULT_ENTITIES);
-    console.log(this.bitingSelf());
-    console.log(this.entities);
-    console.log(DEFAULT_ENTITIES);
-    cur++;
+    console.log('biting self after reset? ' + this.bitingSelf());
+    cur = TimeAttackScenes.SHOP;
   };
   
 /* ==============

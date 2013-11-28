@@ -18,7 +18,7 @@ function TimeAttackEndScene (opts) {
     docCookies.setItem('timeattackscore', highscore);
     upgrades = [ ];
     //do things
-    document.addEventListener('keydown', keyHandler);
+    document.addEventListener('keydown', this.keyHandler);
   }
   this.logic = function () {
     if(!this.initialized) this.init();
@@ -48,7 +48,7 @@ function TimeAttackEndScene (opts) {
       arcadeTimeLimit = 30;
       score = 0;
       scenes[TimeAttackScenes.GAMEOVER].initialized = false;
-      document.removeEventListener('keydown', keyHandler);
+      document.removeEventListener('keydown', this.keyHandler);
       switch(scenes[TimeAttackScenes.GAMEOVER].entities[1].cursor.i) {
         case 0:
           cur = TimeAttackScenes.SNAKE;

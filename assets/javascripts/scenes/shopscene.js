@@ -47,7 +47,7 @@ function ShopScene (opts) {
                     ], { x: vpwidth() / 4,y: vpheight() / 5 } ),
                     new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: vpheight()/10 })
   ];
-  var keyHandler = function (e) {
+  var handleEvent = function (e) {
     var d,
         key = e.which;
     
@@ -66,9 +66,9 @@ function ShopScene (opts) {
       }
     }
     inputs.push(d);
-  };
+  }.bind(this);
   
-  Scene.call(this, name, DEFAULT_ENTITIES, keyHandler);
+  Scene.call(this, name, DEFAULT_ENTITIES, handleEvent);
   
   this.walletUpdated = true;
   this.spent = (opts.spent !== undefined) ? opts.spent : 0;

@@ -9,7 +9,7 @@ function StartScene() {
           new Text({ type: 'MenuItem', text: 'Time Attack' })
       ], { })
   ];
-  var keyHandler = function (e) {
+  var handleEvent = function (e) {
     var d = scenes[0].entities[0].direction,
         key = e.which;
     
@@ -20,7 +20,7 @@ function StartScene() {
           case StartSceneMenuOptions.TIMEATTACK:
             scenes[0].initialized = false;
             cur = TimeAttackScenes.SNAKE;
-            document.removeEventListener('keydown', keyHandler);
+            document.removeEventListener('keydown', this.handleEvent);
             return;
           case 0:
           case 1:
@@ -29,7 +29,7 @@ function StartScene() {
       }
     }
     inputs.push(d);
-  };
+  }.bind(this);
   
-  Scene.call(this, name, DEFAULT_ENTITIES, keyHandler);
+  Scene.call(this, name, DEFAULT_ENTITIES, handleEvent);
 }

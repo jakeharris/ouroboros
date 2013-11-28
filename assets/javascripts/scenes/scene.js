@@ -14,22 +14,24 @@
  */
 
 
-function Scene(name, DEFAULT_ENTITIES, keyHandler) {
+function Scene(name, DEFAULT_ENTITIES, handleEvent) {
   'use strict';
   
   if(typeof name === 'undefined') throw new SceneInitializationException('Scene initialization failed. No valid name supplied.');
   if(typeof DEFAULT_ENTITIES === 'undefined') throw new SceneInitializationException('Scene ' + name + ' initialization failed. No valid DEFAULT_ENTITIES supplied.');
-  if(typeof keyHandler !== 'function') throw new SceneInitializationException('Scene ' + name + ' initialization failed. No valid keyHandler supplied.');
+  if(typeof handleEvent !== 'function') throw new SceneInitializationException('Scene ' + name + ' initialization failed. No valid keyHandler supplied.');
   
   this.DEFAULT_ENTITIES = DEFAULT_ENTITIES; //overwrite this
-  this.keyHandler = keyHandler; //overwrite this
+  this.handleEvent = handleEvent; //overwrite this
   
   this.name = name; //overwrite this
   this.initialized = false;
   this.entities = cloneArray(DEFAULT_ENTITIES); //overwrite this
   
   this.init = function () {
-    document.addEventListener('keydown', this.keyHandler);
+    console.log(name + ' scene is starting...');
+    document.addEventListener('keydown', this.handleEvent);
+    if(name === 'Snake') console.log(DEFAULT_ENTITIES);
     this.initialized = true;
   };
   this.logic = function () {
@@ -52,7 +54,7 @@ function Scene(name, DEFAULT_ENTITIES, keyHandler) {
   this.end = function () {
     this.initialized = false;
     console.log(name + ' scene is ending...');
-    document.removeEventListener(this.keyHandler);
+    document.removeEventListener('keydown', this.handleEvent);
     this.entities = cloneArray(DEFAULT_ENTITIES);
   };
   

@@ -24,7 +24,7 @@ function hasUpgrade(p){
 function cloneArray(arr) {
   var tmp = new Array();
   for(var a in arr) {
-    tmp[a] = arr[a]; 
+    tmp[a] = new Object(arr[a]); 
   }
   return tmp;
 }
