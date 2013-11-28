@@ -14,18 +14,39 @@ function SnakeScene () {
     else if (key == '81' && paused) {
       scenes[TimeAttackScenes.SNAKE].end();
       pause();
+      cur = TimeAttackScenes.MAINMENU;
     }
     inputs.push(d);
   }.bind(this);
   
   Scene.call(this, name, DEFAULT_ENTITIES, handleEvent);
+
+  this.slowMo = false;
+  this.slowMoTimerActive = false;
+
+  this.slowMoHandler = function () {
+        scenes[TimeAttackScenes.SNAKE].entities.forEach(function (e, i, a) {
+            if(i < 2) return;
+            if(!e.hasOwnProperty('lifeTime') || !e.hasOwnProperty('duration')) return;
+            e.lifeTime++;
+        }, this);
+  }.bind(this)
+  
+/* =================
+ * SNAKE - OVERRIDES
+ * =================
+ 
+   Overrides of Scene class functions.
+ 
+ */
   
   this.logic = function () {
         if(!this.initialized) this.init();
         if(!this.entities) this.entities = cloneArray(DEFAULT_ENTITIES);
     
         if(hasUpgrade(Upgrades.Aerobody)) this.aerobody();
-        if(this.entities.length > 2) this.stillair();      
+        if(this.entities.length > 2) this.stillair();
+        else if(this.slowMo) { this.slowMo = false; clearInterval(slowMoLooper); }
     
         if(this.score >= this.maxScore) {
           this.score = this.maxScore; //just in case someone cheated!
@@ -36,14 +57,9 @@ function SnakeScene () {
           return this.end();
         }
         if(this.bitingSelf()) return this.end();
-        if(this.eatingEgg()) return this.eggSpawn();
+        if(this.eatingEgg()) return this.eatEgg();
+        if(this.name === 'Time Attack - Snake' && this.timeIsUp()) return this.end();
         return this.move();
-  };
-  this.move = function () {
-        if(!this.entities) return false;
-        this.entities.forEach(function (e, i, a) {
-          if(e.moves) e.move();
-        });
   };
   this.render = function () {
         if(!this.entities) return;
@@ -60,27 +76,15 @@ function SnakeScene () {
         /* Draw the snake, then the egg, so the egg is always visible, and the snake is always visible above the still airs. */
         this.entities[0].render();
         this.entities[1].render();
-    
-        ctx.fillStyle = '#282828';
-        ctx.beginPath();
-        ctx.fillText('This life: ' + this.score, c.width/20, c.height/10);
-        ctx.fillText('Total: ' + score, c.width/20, c.height/20);
-        ctx.fillText('High score: ' + this.highscore, c.width/20, c.height*3/20);
-        if(this.isArcadeMode) {
-          var minutes = (Math.floor((arcadeTimeLimit - arcadeTimer) / 60)),
-              seconds = ((arcadeTimeLimit - arcadeTimer) - Math.floor((arcadeTimeLimit - arcadeTimer) / 60)*60);
-          ctx.fillText('' + minutes + ':' + ((seconds < 10) ? '0' + seconds : seconds), c.width/2, c.height/20);
-        }
-        ctx.closePath();
-        ctx.fill();
   };  
   this.end = function () {
     this.initialized = false;
+    console.log(this.name + ' scene is ending...');
     document.removeEventListener('keydown', this.handleEvent);
-    this.entities = cloneArray(DEFAULT_ENTITIES);
-    console.log('biting self after reset? ' + this.bitingSelf());
+    this.respawn();
     cur = TimeAttackScenes.SHOP;
   };
+  
   
 /* ==============
  * SNAKE - EVENTS
@@ -100,9 +104,9 @@ function SnakeScene () {
            ||
            snakeHead.y < 0
            ||
-           snakeHead.x > document.width/BLOCK_WIDTH - 1
+           snakeHead.x > vpwidth()/BLOCK_WIDTH - 1
            ||
-           snakeHead.y > document.height/BLOCK_WIDTH - 1)
+           snakeHead.y > vpheight()/BLOCK_WIDTH - 1)
               return true;
         
         return false;
@@ -168,8 +172,9 @@ function SnakeScene () {
         return false;
       };
   this.timeIsUp = function () {
-    return arcadeTimeLimit - arcadeTimer < 0;
+    return false; 
   }
+
 /* ===============
  * SNAKE - ACTIONS
  * ===============
@@ -183,21 +188,22 @@ function SnakeScene () {
 
 this.respawn = function () {
         if(!this.entities) return false;
-        this.entities = cloneArray(DEFAULT_ENTITIES);
-        //if(this.highscore < score) this.highscore = score;
-        score = 0;
+        this.entities[0] = new Snake({ size: 20 });
+        this.entities[1] = new Block({ moves: false, fillStyle: '#CC3A09' });
+        if(this.highscore < this.score) this.highscore = this.score;
+        this.curscore = 0;
       };
 
-this.eggSpawn = function () {
+this.eatEgg = function () {
         if(!this.entities) return false;
         if(!this.entities[0]) return respawn();
         this.entities[1] =  new Block ({ fillStyle: '#CC3A09' }) ;
         this.growSnake();
-        if(this.isArcadeMode) {
-          if(++score > this.highscore) this.highscore = score;
-          arcadeTimeLimit += 3;
+        if(++this.score > this.highscore) {
+          this.highscore = this.score;
         } 
-        this.score++;
+        if(this.name === 'Time Attack - Snake') this.maxTime += 3;
+        this.curscore++;
         this.entities[0].loopsToMove = (this.entities[0].loopsToMove)*0.95 //used to be //entities[0].loops_to_move--;
       };
 
@@ -241,7 +247,51 @@ this.growSnake = function () {
         this.entities.push(new StillZone(this.entities[0].blocks[0].x, this.entities[0].blocks[0].y, { }))
   };
   
+  this.aerobody = function () {
+   this.entities[0].blocks.forEach(function (e, i, a) {
+     if(i > (this.entities[0].blocks.length - 1)/4 && i < (this.entities[0].blocks.length - 1)*3/4)
+       e.isTransparent = true;
+     else e.isTransparent = false;
+   }, this);
+  };
   
+  this.stillair = function () {
+    this.isSlowMo();
+    this.slowMoTimerSetup();
+  };
+
+  this.isSlowMo = function () {
+    if(this.entities.length > 2) { 
+      this.entities.forEach(function (e, i, a) {
+        if(i < 2) return;
+        if(!e.hasOwnProperty('lifeTime') || !e.hasOwnProperty('duration')) return;
+        if(e.lifeTime >= e.duration) { a.splice(i, 1); return; }
+        
+        if (this.slowMo && i > 2) { return; }
+        
+        this.slowMo = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < Math.sqrt(e.r / BLOCK_WIDTH))
+      }, this);
+    } else this.slowMo = false;
+  };    
+  this.slowMoTimerSetup = function () {
+    if(this.slowMo && !this.slowMoTimerActive) { 
+      if(this.name === 'Time Attack - Snake') {
+        clearInterval(this.arcadeTimeLooper); 
+        this.arcadeTimeLooper = setInterval(this.timerHandler, 3000);
+      }
+      slowMoLooper = setInterval(this.slowMoHandler, 1000);
+      this.slowMoHandler();
+      this.slowMoTimerActive = true; 
+    }
+    else if (!this.slowMo && this.slowMoTimerActive) { 
+      if(this.name === 'Time Attack - Snake') {
+        clearInterval(this.arcadeTimeLooper); 
+        this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); 
+      }
+      clearInterval(slowMoLooper);
+      this.slowMoTimerActive = false;
+    }
+  };
 }
 /* ARCADE MODE STUFF - SNAKESCENE
 
@@ -249,20 +299,9 @@ this.isArcadeMode = true; // NOT GONNA ALWAYS BE TRUE IN THE FUTURE
   this.score = 0;
   this.highscore = 0;
   this.maxScore = 50;
-  this.slowMo = false;
-  this.slowMoTimerActive = false;
   arcadeTimeLimit = ARCADE_TIMER_STARTING_MAX;
   
-  var arcadeModeTimerHandler = function () {
-        arcadeTimer++;
-  };
-  var slowMoHandler = function () {
-        scenes[TimeAttackScenes.SNAKE].entities.forEach(function (e, i, a) {
-            if(i < 2) return;
-            if(!e.hasOwnProperty('lifeTime') || !e.hasOwnProperty('duration')) return;
-            e.lifeTime++;
-        }, this);
-  }
+
   
   this.arcadeModeTimerHandler = arcadeModeTimerHandler;
   
@@ -293,54 +332,6 @@ this.isArcadeMode = true; // NOT GONNA ALWAYS BE TRUE IN THE FUTURE
      *//*
     this.score = 0;
     this.initialized = false;
-    cur = (this.timeIsUp()) ? TimeAttackScenes.GAMEOVER : TimeAttackScenes.SHOP;
-  };
-*/
-
-/* STILL AIR STUFF - SNAKESCENE 
-
-        this.stillair = function () {
-          this.isSlowMo();
-          this.slowMoTimerSetup();
-        }
     
-        this.isSlowMo = function () {
-          if(this.entities.length > 2) { 
-            this.entities.forEach(function (e, i, a) {
-              if(i < 2) return;
-              if(!e.hasOwnProperty('lifeTime') || !e.hasOwnProperty('duration')) return;
-              if(e.lifeTime >= e.duration) { a.splice(i, 1); return; }
-              
-              if (this.slowMo && i > 2) { return; }
-              
-              this.slowMo = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < Math.sqrt(e.r / BLOCK_WIDTH))
-            }, this);
-          } else this.slowMo = false;
-        }       
-        this.slowMoTimerSetup = function () {
-          if(this.slowMo && !this.slowMoTimerActive) { 
-            clearInterval(arcadeTimeLooper); 
-            arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 3000);
-            slowMoLooper = setInterval(slowMoHandler, 1000);
-            slowMoHandler();
-            this.slowMoTimerActive = true; 
-          }
-          else if (!this.slowMo && this.slowMoTimerActive) { 
-            clearInterval(arcadeTimeLooper); 
-            arcadeTimeLooper = setInterval(arcadeModeTimerHandler, 1000); 
-            clearInterval(slowMoLooper);
-            this.slowMoTimerActive = false;
-          }
-        };
-        
-*/
-
-/* AEROBODY STUFF - SNAKESCENE
-  this.aerobody = function () {
-   this.entities[0].blocks.forEach(function (e, i, a) {
-     if(i > (this.entities[0].blocks.length - 1)/4 && i < (this.entities[0].blocks.length - 1)*3/4)
-       e.isTransparent = true;
-     else e.isTransparent = false;
-   }, this);
-  }
+  };
 */

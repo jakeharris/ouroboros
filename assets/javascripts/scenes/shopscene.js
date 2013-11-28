@@ -70,9 +70,15 @@ function ShopScene (opts) {
   
   Scene.call(this, name, DEFAULT_ENTITIES, handleEvent);
   
-  this.walletUpdated = true;
   this.spent = (opts.spent !== undefined) ? opts.spent : 0;
 
+  this.init = function () {
+    console.log(name + ' scene is starting...');
+    document.addEventListener('keydown', this.handleEvent);
+    if(name === 'Snake') console.log(DEFAULT_ENTITIES);
+    this.initialized = true;
+    this.walletUpdated = true;
+  };
   
   this.logic = function () {
     if(!this.initialized) this.init();
@@ -80,10 +86,10 @@ function ShopScene (opts) {
       this.entities = cloneArray(DEFAULT_ENTITIES);
     }
     if(this.walletUpdated) {
-      this.wallet = score - this.spent;
+      this.wallet = scenes[TimeAttackScenes.SNAKE].score - this.spent;
       this.entities[2].text = "Eggs remaining: " + this.wallet;
+      this.walletUpdated = false;
     }
-    this.walletUpdated = false;
     return this.move();
   };
   

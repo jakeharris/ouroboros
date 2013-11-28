@@ -31,7 +31,6 @@ function Scene(name, DEFAULT_ENTITIES, handleEvent) {
   this.init = function () {
     console.log(name + ' scene is starting...');
     document.addEventListener('keydown', this.handleEvent);
-    if(name === 'Snake') console.log(DEFAULT_ENTITIES);
     this.initialized = true;
   };
   this.logic = function () {

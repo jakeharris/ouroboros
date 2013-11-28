@@ -65,14 +65,6 @@ Upgrades.Aerobody = {
   isUnique: true
 }
 
-/*Upgrades.TimeExtension = {
-  id: 4,
-  name: "Time extension",
-  price: 10,
-  flavorText: "Adds 30s to the timer.",
-  isUnique: false
-}*/
-
 function Block (opts) {
   
   this.x = (opts !== undefined && opts.x !== undefined) ? opts.x : Math.floor(Math.random() * Math.floor( width/BLOCK_WIDTH ));
@@ -88,6 +80,7 @@ function Block (opts) {
   this.direction = (opts.direction !== undefined) ? opts.direction : Direction.UP;
   
   this.move = function () {
+    if(!this.moves) return false;
     switch (this.direction) {
       case Direction.LEFT:
         this.x = this.x - 1;
@@ -159,14 +152,14 @@ function Block (opts) {
 }
 
 function getDirectionFromWallProximity(b) { //b for block
-  switch(Math.min(b.x, b.y, (Math.floor( document.width/BLOCK_WIDTH ) - b.x), (Math.floor( document.height/BLOCK_HEIGHT ) - b.y))) {
+  switch(Math.min(b.x, b.y, (Math.floor( vpwidth()/BLOCK_WIDTH ) - b.x), (Math.floor( vpheight()/BLOCK_HEIGHT ) - b.y))) {
     case b.x: //nearest the left wall
       return (b.direction = Direction.RIGHT);
     case b.y: //nearest the top wall
       return (b.direction = Direction.DOWN);
-    case (Math.floor( document.width/BLOCK_WIDTH ) - b.x):
+    case (Math.floor( vpwidth()/BLOCK_WIDTH ) - b.x):
       return (b.direction = Direction.LEFT);
-    case (Math.floor( document.height/BLOCK_HEIGHT ) - b.y):
+    case (Math.floor( vpheight()/BLOCK_HEIGHT ) - b.y):
       return (b.direction = Direction.UP);
     default:
       return (b.direction = Direction.UP);
@@ -179,7 +172,7 @@ function Snake (opts, blockopts) {
   this.loopsToMove = (opts.loops) ? opts.loops : SNAKE_BASE_LOOPS_TO_MOVE,
   this.loops = 0;
   this.tail;
-  this.direction = (opts.direction) ? opts.direction : getDirectionFromWallProximity(this.blocks[0]);
+  this.direction = getDirectionFromWallProximity(this.blocks[0]);
   
   this.moves = true;
   this.move = function () {

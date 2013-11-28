@@ -11,15 +11,9 @@ var width = vpwidth(),
     scenes = [],
     cur = 0,
     game,
-    arcadeTimeLooper,
-    arcadeTimer = 0,
-    arcadeTimeLimit = 0,
     inputs = [],
     paused = false,
-    score = 0,
-    scores = [],
-    upgrades = [],
-    highscore = 0;
+    upgrades = [];
 
 ctx.font = "22pt Cascada";
 
@@ -40,7 +34,7 @@ var clear = function () {
     };
 
 var render = function () { 
-        if(!scenes || !scenes[0]) scenes = [ new StartScene({ }), new SnakeScene({ }), new ShopScene({ }), new TimeAttackEndScene({ }) ];
+        if(!scenes || !scenes[0]) scenes = [ new StartScene({ }), new TimeAttackSnakeScene({ }), new ShopScene({ }), new TimeAttackEndScene({ }) ];
         if(!scenes[cur]) {
           console.log("Current scene variable cur has exceeded legal bounds. (val: " + cur + ").")
           //return false;
@@ -49,7 +43,7 @@ var render = function () {
     };
 
 var logic = function () {
-        if(!scenes || !scenes[0]) scenes = [ new StartScene({ }), new SnakeScene({ }), new ShopScene({ }), new TimeAttackEndScene({ }) ];
+        if(!scenes || !scenes[0]) scenes = [ new StartScene({ }), new TimeAttackSnakeScene({ }), new ShopScene({ }), new TimeAttackEndScene({ }) ];
         if(!scenes[cur]) {
           console.log("Current scene variable cur has exceeded legal bounds. (val: " + cur + ").")
           //return false;
@@ -83,11 +77,11 @@ var pause = function () {
         renderPause();
         if(!paused) {
           clearTimeout(game);
-          if(scenes[1].isArcadeMode) clearInterval(arcadeTimeLooper);
+          if(scenes[cur].name === 'Time Attack - Snake') clearInterval(scenes[cur].arcadeTimeLooper);
           paused = true;
         } else {
           game = setTimeout(loop, 10);
-          if(scenes[cur].isArcadeMode) { arcadeTimeLooper = setInterval(scenes[cur].arcadeModeTimerHandler, 1000); }
+          if(scenes[cur].name === 'Time Attack - Snake') { scenes[cur].arcadeTimeLooper = setInterval(scenes[cur].timerHandler, 1000); }
           paused = false;
         }
 }
