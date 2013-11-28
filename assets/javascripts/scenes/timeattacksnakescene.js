@@ -19,6 +19,7 @@ function TimeAttackSnakeScene() {
     document.addEventListener('keydown', this.handleEvent);
     this.initialized = true;
     this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); 
+    if(docCookies.hasItem('timeattackscore')) this.highscore = docCookies.getItem('timeattackscore');
   };
   
   this.render = function () {

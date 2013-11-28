@@ -5,7 +5,7 @@ function StartScene() {
       new Text({ type: 'Title', text: 'OUROBOROS' }),
       new Menu([
           new Text({ type: 'MenuItem', text: 'New Game (coming soon!)' }),
-          new Text({ type: 'MenuItem', text: 'Continue (coming soon!)', fillStyle: (docCookies.hasItem('save')) ? '#282828' : '#aaa' }),
+          new Text({ type: 'MenuItem', text: 'Continue (coming soon!)', fillStyle: (docCookies.hasItem('save') && docCookies.hasItem('game')) ? '#282828' : '#aaa' }),
           new Text({ type: 'MenuItem', text: 'Time Attack' })
       ], { })
   ];
@@ -32,4 +32,5 @@ function StartScene() {
   }.bind(this);
   
   Scene.call(this, name, DEFAULT_ENTITIES, handleEvent);
+  
 }
