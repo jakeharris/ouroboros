@@ -24,6 +24,7 @@ function TimeAttackEndScene (opts) {
       upgrades = [ ];
       scenes[TimeAttackScenes.SNAKE].timePassed = 0;
       scenes[TimeAttackScenes.SNAKE].maxTime = ARCADE_TIMER_STARTING_MAX;
+      scenes[TimeAttackScenes.SNAKE].score = 0;
       scenes[TimeAttackScenes.GAMEOVER].initialized = false;
       document.removeEventListener('keydown', this.handleEvent);
       switch(scenes[TimeAttackScenes.GAMEOVER].entities[1].cursor.i) {
