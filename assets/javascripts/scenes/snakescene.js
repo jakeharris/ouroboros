@@ -20,17 +20,8 @@ function SnakeScene () {
   }.bind(this);
   
   Scene.call(this, name, DEFAULT_ENTITIES, handleEvent);
-
-  this.slowMo = false;
-  this.slowMoTimerActive = false;
-
-  this.slowMoHandler = function () {
-        scenes[TimeAttackScenes.SNAKE].entities.forEach(function (e, i, a) {
-            if(i < 2) return;
-            if(!e.hasOwnProperty('lifeTime') || !e.hasOwnProperty('duration')) return;
-            e.lifeTime++;
-        }, this);
-  }.bind(this)
+  
+  this.inStillAir = false;
   
 /* =================
  * SNAKE - OVERRIDES
@@ -46,7 +37,7 @@ function SnakeScene () {
     
         if(hasUpgrade(Upgrades.Aerobody)) this.aerobody();
         if(this.entities.length > 2) this.stillair();
-        else if(this.slowMo) { this.slowMo = false; clearInterval(slowMoLooper); }
+        else if(this.slowMo) { this.slowMo = false; clearInterval(this.slowTimeLooper); this.slowTimeLooper = null; this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); }
     
         if(this.score >= this.maxScore) {
           this.score = this.maxScore; //just in case someone cheated!
@@ -261,35 +252,36 @@ this.growSnake = function () {
   };
 
   this.isSlowMo = function () {
-    if(this.entities.length > 2) { 
-      this.entities.forEach(function (e, i, a) {
-        if(i < 2) return;
-        if(!e.hasOwnProperty('lifeTime') || !e.hasOwnProperty('duration')) return;
-        if(e.lifeTime >= e.duration) { a.splice(i, 1); return; }
+    var entitiesToRemove = [];
+    for(var i = 0; i < this.entities.length; i++) {
+      if(this.entities[i].hasOwnProperty('alive')) {
+        if (!this.entities[i].alive) { entitiesToRemove.push(i); }
         
-        if (this.slowMo && i > 2) { return; }
+        var e = this.entities[i],
+            a = this.entities;
         
-        this.slowMo = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < Math.sqrt(e.r / BLOCK_WIDTH))
-      }, this);
-    } else this.slowMo = false;
+        this.inStillAir = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < Math.sqrt(e.r / BLOCK_WIDTH));
+      }
+    }
+    for(var i = entitiesToRemove.length - 1; i >= 0; i--) {
+      this.entities.splice(entitiesToRemove[i], 1);
+    }
   };    
   this.slowMoTimerSetup = function () {
-    if(this.slowMo && !this.slowMoTimerActive) { 
-      if(this.name === 'Time Attack - Snake') {
+    if(this.inStillAir && this.arcadeTimeLooper != null) { 
+      if(this.name === 'Time Attack - Snake') { // not sure if want
         clearInterval(this.arcadeTimeLooper); 
-        this.arcadeTimeLooper = setInterval(this.timerHandler, 3000);
+        this.arcadeTimeLooper = null
+        this.slowTimeLooper = setInterval(this.timerHandler, 3000);
+        this.timerHandler();
       }
-      slowMoLooper = setInterval(this.slowMoHandler, 1000);
-      this.slowMoHandler();
-      this.slowMoTimerActive = true; 
     }
-    else if (!this.slowMo && this.slowMoTimerActive) { 
+    else if (!this.slowMo && this.arcadeTimeLooper == null) { 
       if(this.name === 'Time Attack - Snake') {
-        clearInterval(this.arcadeTimeLooper); 
+        clearInterval(this.slowTimeLooper);
+        this.slowTimeLooper = null;
         this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); 
       }
-      clearInterval(slowMoLooper);
-      this.slowMoTimerActive = false;
     }
   };
 }

@@ -406,8 +406,12 @@ function StillZone (x, y, opts) {
   
   this.r = (opts.r) ? opts.r : STILLZONE_BASE_RADIUS;
   
-  this.duration = (opts.duration) ? opts.duration : STILLZONE_BASE_DURATION;
-  this.lifeTime = 0;
+  this.alive = true;
+  this.destroy = function () {
+    this.alive = false;
+  };
+  
+  this.lifetimeID = setInterval(this.destroy, 3000);
   
   this.move = function () {
      if(this.r < STILLZONE_BASE_RADIUS*BLOCK_WIDTH) this.r++;
