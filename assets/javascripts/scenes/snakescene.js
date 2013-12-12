@@ -73,7 +73,13 @@ function SnakeScene () {
         /* Draw the snake, then the egg, so the egg is always visible, and the snake is always visible above the still airs. */
         this.entities[0].render();
         this.entities[1].render();
-  };  
+  };
+  this.move = function () {
+      if (!this.entities) throw new EntityInitializationException(this.name + ': move() function didn\'t get an entity set.');
+      this.entities.forEach(function (e, i, a) {
+          e.move();
+      });
+  };
   this.end = function () {
     this.initialized = false;
     console.log(this.name + ' scene is ending...');

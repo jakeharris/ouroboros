@@ -97,14 +97,14 @@ function Block (opts) {
       default:
         return false;
     }
-    if(hasUpgrade(Upgrades.GoldenPlumes) && (this.x < 0 || this.x > document.width/BLOCK_WIDTH - 1 || this.y < 0 || this.y > document.height/BLOCK_WIDTH - 1)) {
+    if(hasUpgrade(Upgrades.GoldenPlumes) && (this.x < 0 || this.x > vpwidth()/BLOCK_WIDTH - 1 || this.y < 0 || this.y > vpheight()/BLOCK_WIDTH - 1)) {
       if(this.x < 0) {
-        this.x = document.width/BLOCK_WIDTH - 1; 
-      } else if (this.x > document.width/BLOCK_WIDTH - 1) {
+        this.x = vpwidth()/BLOCK_WIDTH - 1; 
+      } else if (this.x > vpwidth() / BLOCK_WIDTH - 1) {
         this.x = 0; 
       } else if (this.y < 0) {
-        this.y = Math.floor(document.height/BLOCK_WIDTH) - 1; 
-      } else if (this.y > document.height/BLOCK_WIDTH - 1) {
+          this.y = Math.floor(vpheight() / BLOCK_WIDTH) - 1;
+      } else if (this.y > vpheight()/BLOCK_WIDTH - 1) {
         this.y = 0; 
       }
     }
