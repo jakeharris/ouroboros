@@ -22,7 +22,8 @@ function SnakeScene () {
   Scene.call(this, name, DEFAULT_ENTITIES, handleEvent);
   
   this.inStillAir = false;
-  
+  this.arcadeTimerLooper = 0;
+  this.slowTimeLooper = null;
 /* =================
  * SNAKE - OVERRIDES
  * =================
@@ -37,7 +38,12 @@ function SnakeScene () {
     
         if(hasUpgrade(Upgrades.Aerobody)) this.aerobody();
         if(this.entities.length > 2) this.stillair();
-        else if(this.slowMo) { this.slowMo = false; clearInterval(this.slowTimeLooper); this.slowTimeLooper = null; this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); }
+        else if (this.inStillAir) {
+            this.inStillAir = false;
+            clearInterval(this.slowTimeLooper);
+            this.slowTimeLooper = null;
+            this.arcadeTimeLooper = setInterval(this.timerHandler, 1000);
+        }
     
         if(this.score >= this.maxScore) {
           this.score = this.maxScore; //just in case someone cheated!
@@ -276,7 +282,7 @@ this.growSnake = function () {
         this.timerHandler();
       }
     }
-    else if (!this.slowMo && this.arcadeTimeLooper == null) { 
+    else if (!this.inStillAir && this.arcadeTimeLooper == null) { 
       if(this.name === 'Time Attack - Snake') {
         clearInterval(this.slowTimeLooper);
         this.slowTimeLooper = null;
