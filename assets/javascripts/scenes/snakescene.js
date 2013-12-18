@@ -10,6 +10,10 @@ function SnakeScene () {
     else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '32' && hasUpgrade(Upgrades.StillAir)) scenes[TimeAttackScenes.SNAKE].spawnStillZone(); 
+    else if (key == '17') {
+      scenes[TimeAttackScenes.SNAKE].end();
+      cur = TimeAttackScenes.SHOP;
+    }
     else if (key == '27' || key == '80') pause();
     else if (key == '81' && paused) {
       scenes[TimeAttackScenes.SNAKE].end();
@@ -51,9 +55,11 @@ function SnakeScene () {
         }
         if(this.atWorldsEnd()) {
           if(hasUpgrade(Upgrades.GoldenPlumes)) return this.move();
-          return this.end();
+          this.respawn();
+          this.end();
+          cur = TimeAttackScenes.GAMEOVER;
         }
-        if(this.bitingSelf()) return this.end();
+        if(this.bitingSelf()) { this.respawn(); this.end(); cur = TimeAttackScenes.GAMEOVER; }
         if(this.eatingEgg()) return this.eatEgg();
         if(this.name === 'Time Attack - Snake' && this.timeIsUp()) return this.end();
         return this.move();
@@ -84,7 +90,6 @@ function SnakeScene () {
     this.initialized = false;
     console.log(this.name + ' scene is ending...');
     document.removeEventListener('keydown', this.handleEvent);
-    this.respawn();
     cur = TimeAttackScenes.SHOP;
   };
   
