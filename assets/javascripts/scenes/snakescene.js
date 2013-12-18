@@ -193,7 +193,7 @@ this.respawn = function () {
         if(!this.entities) return false;
         this.entities[0] = new Snake({ size: 20 });
         this.entities[1] = new Block({ moves: false, fillStyle: '#CC3A09' });
-        if(this.highscore < this.score) this.highscore = this.score;
+        if(this.highscore < this.score) { this.highscore = this.score; docCookies.setItem('timeattackscore', this.highscore); }
         this.curscore = 0;
       };
 
@@ -204,6 +204,7 @@ this.eatEgg = function () {
         this.growSnake();
         if(++this.score > this.highscore) {
           this.highscore = this.score;
+          docCookies.setItem('timeattackscore', this.highscore);
         } 
         if(this.name === 'Time Attack - Snake') this.maxTime += 3;
         this.curscore++;
