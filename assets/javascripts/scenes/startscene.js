@@ -7,7 +7,7 @@ function StartScene() {
           new Text({ type: 'MenuItem', text: 'New Game (coming soon!)' }),
           new Text({ type: 'MenuItem', text: 'Continue (coming soon!)', fillStyle: (docCookies.hasItem('save') && docCookies.hasItem('game')) ? '#282828' : '#aaa' }),
           new Text({ type: 'MenuItem', text: 'Time Attack' })
-      ], { })
+      ], { x: vpwidth()/2 - 185, y: vpheight()/2 })
   ];
   var handleEvent = function (e) {
     var d = scenes[0].entities[0].direction,

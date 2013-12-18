@@ -182,7 +182,7 @@ function Snake (opts, blockopts) {
           loopsToMove = Upgrades.SmoothUnderbelly.speed; 
       }
     }
-    if(scenes[cur].slowMo) loopsToMove = SNAKE_BASE_LOOPS_TO_MOVE*4;
+    if(scenes[cur].inStillAir) loopsToMove = SNAKE_BASE_LOOPS_TO_MOVE*3;
     if(++this.loops >= loopsToMove) {
         for(var x = 0; x < this.speed; x++) {
           this.tail = this.blocks.pop();
