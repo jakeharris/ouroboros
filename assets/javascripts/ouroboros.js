@@ -31,6 +31,13 @@ var clear = function () {
         ctx.rect(0, 0, width, height);
         ctx.closePath();
         ctx.fill();
+        /*if(cur === TimeAttackScenes.SNAKE) {
+          ctx.beginPath();
+          ctx.closePath();
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = 'black';
+          ctx.stroke();
+        }*/
     };
 
 var render = function () { 
