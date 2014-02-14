@@ -11,7 +11,7 @@ function SnakeScene () {
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '32' && hasUpgrade(Upgrades.StillAir)) scenes[TimeAttackScenes.SNAKE].spawnStillZone(); 
     else if (key == '17') {
-      scenes[TimeAttackScenes.SNAKE].end();
+      scenes[TimeAttackScenes.SNAKE].pause();
       cur = TimeAttackScenes.SHOP;
     }
     else if (key == '27' || key == '80') pause();
@@ -92,7 +92,15 @@ function SnakeScene () {
     document.removeEventListener('keydown', this.handleEvent);
     cur = TimeAttackScenes.SHOP;
   };
-  
+  this.pause = function () {
+    console.log(this.name + ' scene is pausing...');
+    console.log('WE MIGHT ONLY USE THIS PATTERN FOR SNAKE -> SHOP SCENE TRANSITION');
+    document.removeEventListener('keydown', this.handleEvent);
+    cur = TimeAttackScenes.SHOP;
+  }; 
+  this.unpause = function () {
+    document.addEventListener('keydown', this.handleEvent);
+  }
   
 /* ==============
  * SNAKE - EVENTS

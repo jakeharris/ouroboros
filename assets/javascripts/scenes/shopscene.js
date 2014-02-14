@@ -59,6 +59,7 @@ function ShopScene (opts) {
       if(scenes[TimeAttackScenes.SHOP].entities[1].cursor.i == scenes[TimeAttackScenes.SHOP].entities[1].items.length - 1) {
         scenes[TimeAttackScenes.SHOP].end();
         cur = TimeAttackScenes.SNAKE;
+        scenes[TimeAttackScenes.SNAKE].unpause();
         return;
       }
       if(scenes[TimeAttackScenes.SHOP].entities[1].items[scenes[TimeAttackScenes.SHOP].entities[1].cursor.i].val <= scenes[TimeAttackScenes.SHOP].wallet ) {

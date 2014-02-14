@@ -20,10 +20,11 @@ ctx.font = "22pt Cascada";
 var clear = function () {
         width = vpwidth();
         height = vpheight();
-        if(c.width != vpwidth() || c.height != vpheight()) {
-          c.width = vpwidth();
-          c.height = vpheight();
-          BLOCK_WIDTH = Math.floor(vpwidth() / 60);
+        setGameDimensions(width, height);
+        if(c.width != width || c.height != height) {
+          c.width = width;
+          c.height = height;
+          BLOCK_WIDTH = Math.floor(width / 60);
           BLOCK_HEIGHT = BLOCK_WIDTH;
         }
         ctx.fillStyle = '#fff';

@@ -12,7 +12,25 @@ var vpwidth = function () {
    return window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth||0;
 }
 var vpheight = function () {
-   return window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
+   var height = window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
+}
+
+var setGameDimensions = function(w, h) {
+   
+   if(w >= 1920) w = 1920;
+   if(w >= 1600) w = 1600;
+   if(w >= 1366) w = 1366;
+   if(w >= 1024) w = 1024;
+   if(w >= 800)  w = 800;
+   if(w >= 640)  w = 640;
+
+   if(h >= 1080) h = 1080;
+   if(h >= 900)  h = 900;
+   if(h >= 768)  h = 768;
+   if(h >= 640)  h = 640;
+   if(h >= 600)  h = 600;
+   if(h >= 480)  h = 480;
+
 }
 
 function hasUpgrade(p){
