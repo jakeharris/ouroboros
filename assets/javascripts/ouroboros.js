@@ -77,7 +77,8 @@ var renderPause = function () {
         ctx.fillStyle = "#fff";
         ctx.beginPath();
         ctx.fillText('Press P or ESC to continue playing.', c.width*3/8, c.height/2); //FIXME
-        ctx.fillText('Press Q to quit.', c.width*3/8, c.height/2 + 32);
+        ctx.fillText('Press Left Ctrl to enter the shop.', c.width*3/8, c.height/2 + 32);
+        ctx.fillText('Press Q to quit.', c.width*3/8, c.height/2 + 64);
         ctx.closePath();
 }
 

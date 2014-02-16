@@ -1,6 +1,6 @@
 function TimeAttackEndScene (opts) {
   var name = "Game Over";
-  var DEFAULT_EVENTS = [ 
+  var DEFAULT_ENTITIES = [ 
                     new Text( { type: "Title", text: this.name, y: vpheight()/20 } ),
                     new Menu( [
                                 new Text( { type: "MenuItem", text: "Retry" } ), 
@@ -42,7 +42,7 @@ function TimeAttackEndScene (opts) {
     inputs.push(d);
   }.bind(this);
   
-  Scene.call(this, name, DEFAULT_EVENTS, handleEvent);
+  Scene.call(this, name, DEFAULT_ENTITIES, handleEvent);
 
   this.logic = function () {
     if(!this.initialized) this.init();

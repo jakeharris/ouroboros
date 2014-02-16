@@ -12,7 +12,7 @@ var vpwidth = function () {
    return window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth||0;
 }
 var vpheight = function () {
-   var height = window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
+   return window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
 }
 
 var setGameDimensions = function(w, h) {

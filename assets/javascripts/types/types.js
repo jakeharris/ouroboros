@@ -74,7 +74,7 @@ function Block (opts) {
   this.moves = (opts.moves) ? opts.moves : false,
   this.fillStyle = (opts.fillStyle) ? opts.fillStyle : '#282828'; /* must be a color or a gradient or a pattern */
   this.sprite = new Image();
-  this.sprite.src = 'assets/sprites/snake-body-04.png';
+  this.sprite.src = 'assets/sprites/snake-body-vert-modern.png';
   
   this.multiplier = 1;
   this.direction = (opts.direction !== undefined) ? opts.direction : Direction.UP;

@@ -42,10 +42,10 @@ function TimeAttackSnakeScene() {
     
     ctx.fillStyle = '#282828';
     ctx.beginPath();
-    ctx.fillText('Total: ' + this.score, c.width/20, c.height/20);
-    ctx.fillText('This life: ' + this.curscore, c.width/20, c.height/10);
-    ctx.fillText('High score: ' + this.highscore, c.width/20, c.height*3/20);
-    ctx.fillText('' + minutes + ':' + ((seconds < 10) ? '0' + seconds : seconds), c.width/2, c.height/20);
+    ctx.fillText('Total: ' + this.score, width/20, height/20);
+    ctx.fillText('This life: ' + this.curscore, width/20, height/10);
+    ctx.fillText('High score: ' + this.highscore, width/20, height*3/20);
+    ctx.fillText('' + minutes + ':' + ((seconds < 10) ? '0' + seconds : seconds), width/2, height/20);
     ctx.closePath();
     ctx.fill();
   };
