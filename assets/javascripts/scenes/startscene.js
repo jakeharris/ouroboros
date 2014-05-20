@@ -3,14 +3,18 @@ function StartScene() {
   var name = "Start Menu";
   var DEFAULT_ENTITIES = [
       new Text({ type: 'Title', text: 'OUROBOROS' }),
-      new Menu([
+      new Text({ type: 'MenuItem', text: 'Press any key to start', x: vpwidth()/2 - 130, y: vpheight()/2 })
+      /*new Menu([
           new Text({ type: 'MenuItem', text: 'New Game (coming soon!)' }),
           new Text({ type: 'MenuItem', text: 'Continue (coming soon!)', fillStyle: (docCookies.hasItem('save') && docCookies.hasItem('game')) ? '#282828' : '#aaa' }),
           new Text({ type: 'MenuItem', text: 'Time Attack' })
-      ], { x: vpwidth()/2 - 185, y: vpheight()/2 })
+      ], { x: vpwidth()/2 - 185, y: vpheight()/2 })*/
   ];
   var handleEvent = function (e) {
-    var d = scenes[0].entities[0].direction,
+    scenes[0].initialized = false;
+    cur = TimeAttackScenes.SNAKE;
+    document.removeEventListener('keydown', this.handleEvent);
+    /*var d = scenes[0].entities[0].direction,
         key = e.which;
     
     if      (key == '38' && d != Direction.DOWN)  d = Direction.UP;
@@ -28,7 +32,7 @@ function StartScene() {
             break;
       }
     }
-    inputs.push(d);
+    inputs.push(d);*/
   }.bind(this);
   
   Scene.call(this, name, DEFAULT_ENTITIES, handleEvent);

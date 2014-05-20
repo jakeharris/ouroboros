@@ -11,6 +11,7 @@ function SnakeScene () {
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '32' && hasUpgrade(Upgrades.StillAir)) scenes[TimeAttackScenes.SNAKE].spawnStillZone(); 
     else if (key == '17') {
+      if(paused) pause();
       scenes[TimeAttackScenes.SNAKE].pause();
       cur = TimeAttackScenes.SHOP;
     }

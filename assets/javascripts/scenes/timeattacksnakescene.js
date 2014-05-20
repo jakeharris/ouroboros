@@ -58,6 +58,17 @@ function TimeAttackSnakeScene() {
     cur = (this.timeIsUp()) ? TimeAttackScenes.GAMEOVER : TimeAttackScenes.SHOP;
     clearInterval(this.arcadeTimeLooper);
   };
+  this.pause = function () {
+    console.log(this.name + ' scene is pausing...');
+    console.log('WE MIGHT ONLY USE THIS PATTERN FOR SNAKE -> SHOP SCENE TRANSITION');
+    document.removeEventListener('keydown', this.handleEvent);
+    clearInterval(this.arcadeTimeLooper);
+    cur = TimeAttackScenes.SHOP;
+  }; 
+  this.unpause = function () {
+    document.addEventListener('keydown', this.handleEvent);
+    this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); 
+  }
   
   this.timeIsUp = function () {
     return this.maxTime - this.timePassed <= 0;
