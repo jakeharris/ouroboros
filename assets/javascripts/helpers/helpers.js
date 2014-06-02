@@ -15,22 +15,36 @@ var vpheight = function () {
    return window.innerHeight||document.documentElement.clientHeight||document.body.clientHeight||0;
 }
 
-var setGameDimensions = function(w, h) {
+var setGameDimensions = function(w, h, bw, bh) {
    
    if(w >= 1920) w = 1920;
-   if(w >= 1600) w = 1600;
-   if(w >= 1366) w = 1366;
-   if(w >= 1024) w = 1024;
-   if(w >= 800)  w = 800;
-   if(w >= 640)  w = 640;
-
+   else if(w >= 1600) w = 1600;
+   else if(w >= 1366) w = 1366;
+   else if(w >= 1024) w = 1024;
+   else if(w >= 800)  w = 800;
+   else if(w >= 640)  w = 640;
+   else w = 320;
+  
+  
    if(h >= 1080) h = 1080;
-   if(h >= 900)  h = 900;
-   if(h >= 768)  h = 768;
-   if(h >= 640)  h = 640;
-   if(h >= 600)  h = 600;
-   if(h >= 480)  h = 480;
-
+   else if(h >= 900)  h = 900;
+   else if(h >= 768)  h = 768;
+   else if(h >= 640)  h = 640;
+   else if(h >= 600)  h = 600;
+   else if(h >= 480)  h = 480;
+   else h = 320;
+  
+   bw = Math.floor(w/30);
+   bh = bw;
+   h = bh*15;
+  
+   return {
+     width: w,
+     height: h,
+     block_width: bw,
+     block_height: bh
+   }
+  
 }
 
 function hasUpgrade(p){

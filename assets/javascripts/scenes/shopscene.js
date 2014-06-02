@@ -1,11 +1,11 @@
 function ShopScene (opts) {
-  var name = "Yopico Shop";
+  var name = 'Yopico Shop';
   var DEFAULT_ENTITIES = [ 
-                    new Text( { type: "Title", text: this.name, y: vpheight()/20 } ),
+                    new Text( { type: 'Title', text: name, y: height/20 } ),
                     new Menu( [
                                 new Text( {
-                                  type: "MenuItem",
-                                  text: "Consumables: ",
+                                  type: 'MenuItem',
+                                  text: 'Consumables: ',
                                   isCursorable: false
                                 } ),
                                 /*new ShopItem( {
@@ -21,8 +21,8 @@ function ShopScene (opts) {
                                   id: Upgrades.StillAir.id
                                 } ), //gives 1 breeze (slows time)
                                 new Text( {
-                                  type: "MenuItem",
-                                  text: "Upgrades: ",
+                                  type: 'MenuItem',
+                                  text: 'Upgrades: ',
                                   isCursorable: false
                                 } ),
                                 new ShopItem( { 
@@ -43,9 +43,9 @@ function ShopScene (opts) {
                                   flavorText: Upgrades.Aerobody.flavorText, 
                                   id: Upgrades.Aerobody.id
                                 } ), //segments of unit collision avoidance in the body
-                                new Text( { type: "MenuItem", text: "Exit shop", isQuitOption: true } )
-                    ], { x: vpwidth() / 4,y: vpheight() / 5 } ),
-                    new Text( { type: "Subtitle", text: "Eggs remaining: " + this.wallet, y: vpheight()/10 })
+                                new Text( { type: 'MenuItem', text: 'Exit shop', isQuitOption: true } )
+                    ], { x: width / 4,y: height / 5 } ),
+                    new Text( { type: 'Subtitle', text: 'Eggs remaining: ' + this.wallet, y: height/10 })
   ];
   var handleEvent = function (e) {
     var d,
@@ -88,9 +88,12 @@ function ShopScene (opts) {
     }
     if(this.walletUpdated) {
       this.wallet = scenes[TimeAttackScenes.SNAKE].score - this.spent;
-      this.entities[2].text = "Eggs remaining: " + this.wallet;
+      this.entities[2].text = 'Eggs remaining: ' + this.wallet;
       this.walletUpdated = false;
     }
+    this.entities[0].x = width / 2 - 100;
+    this.entities[1].x = width / 2 - 100;
+    this.entities[2].x = width / 2 - 100;
     return this.move();
   };
   

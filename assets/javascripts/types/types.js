@@ -11,6 +11,7 @@
 var BLOCK_WIDTH = Math.floor(vpwidth() / 60),
     BLOCK_HEIGHT = BLOCK_WIDTH,
     BLOCK_BASE_SPEED = 4,
+    SNAKE_BASE_SIZE = 5,
     SNAKE_BASE_SPEED = 1,
     SNAKE_BASE_LOOPS_TO_MOVE = 15,
     SNAKE_BASE_LENGTH = 4,
@@ -97,14 +98,14 @@ function Block (opts) {
       default:
         return false;
     }
-    if(hasUpgrade(Upgrades.GoldenPlumes) && (this.x < 0 || this.x > vpwidth()/BLOCK_WIDTH - 1 || this.y < 0 || this.y > vpheight()/BLOCK_WIDTH - 1)) {
+    if(hasUpgrade(Upgrades.GoldenPlumes) && (this.x < 0 || this.x > width/BLOCK_WIDTH - 1 || this.y < 0 || this.y > height/BLOCK_WIDTH - 1)) {
       if(this.x < 0) {
-        this.x = vpwidth()/BLOCK_WIDTH - 1; 
-      } else if (this.x > vpwidth() / BLOCK_WIDTH - 1) {
+        this.x = width/BLOCK_WIDTH - 1; 
+      } else if (this.x > width / BLOCK_WIDTH - 1) {
         this.x = 0; 
       } else if (this.y < 0) {
-          this.y = Math.floor(vpheight() / BLOCK_WIDTH) - 1;
-      } else if (this.y > vpheight()/BLOCK_WIDTH - 1) {
+          this.y = Math.floor(height / BLOCK_WIDTH) - 1;
+      } else if (this.y > height/BLOCK_WIDTH - 1) {
         this.y = 0; 
       }
     }
@@ -152,14 +153,14 @@ function Block (opts) {
 }
 
 function getDirectionFromWallProximity(b) { //b for block
-  switch(Math.min(b.x, b.y, (Math.floor( vpwidth()/BLOCK_WIDTH ) - b.x), (Math.floor( vpheight()/BLOCK_HEIGHT ) - b.y))) {
+  switch(Math.min(b.x, b.y, (Math.floor( width/BLOCK_WIDTH ) - b.x), (Math.floor( height/BLOCK_HEIGHT ) - b.y))) {
     case b.x: //nearest the left wall
       return (b.direction = Direction.RIGHT);
     case b.y: //nearest the top wall
       return (b.direction = Direction.DOWN);
-    case (Math.floor( vpwidth()/BLOCK_WIDTH ) - b.x):
+    case (Math.floor( width/BLOCK_WIDTH ) - b.x):
       return (b.direction = Direction.LEFT);
-    case (Math.floor( vpheight()/BLOCK_HEIGHT ) - b.y):
+    case (Math.floor( height/BLOCK_HEIGHT ) - b.y):
       return (b.direction = Direction.UP);
     default:
       return (b.direction = Direction.UP);
@@ -252,10 +253,10 @@ function Snake (opts, blockopts) {
 
 function Menu (items, opts) {
   this.items = items;
-  this.spacing = (opts.spacing) ? opts.spacing : 2*BLOCK_HEIGHT;
-  this.x = (opts.x) ? opts.x : (vpwidth() / 2 - 100);
-  this.y = (opts.y) ? opts.y : (vpheight() - 400);
-  this.cursor = new Cursor ( items.length - 1, { } )
+  this.spacing = (opts.spacing) ? opts.spacing : height / 10;
+  this.x = (opts.x) ? opts.x : function () { return (width / 2 - 100); };
+  this.y = (opts.y) ? opts.y : (height - 400);
+  this.cursor = new Cursor ( items.length - 1, { h: 16, w: 16 } )
   
   while(this.items[this.cursor.i].isCursorable !== undefined && !this.items[this.cursor.i].isCursorable) this.cursor.i++;
   
@@ -270,10 +271,18 @@ function Menu (items, opts) {
   }, this);
   
   this.render = function () {
-    this.cursor.render(this.x, this.items[this.cursor.i].y - BLOCK_HEIGHT);
+    this.spacing = height / 10;
+    this.cursor.render(this.x(), this.items[this.cursor.i].y - this.cursor.h);
     items.forEach(function (e, i, a) {
+      e.x = this.x();
+      e.y = this.y;
+      if(e.type === "MenuItem") {
+        e.x += BLOCK_WIDTH;
+        e.y += i*this.spacing;
+      }
+      if (i == items.length - 1 && e.isQuitOption == true) e.y += this.spacing;
       e.render();
-    });
+    }, this);
   }
   
   this.move = function () {
@@ -334,9 +343,9 @@ function ShopItem (opts) {
   this.flavorText = (opts.flavorText) ? opts.flavorText : Upgrades.SmoothUnderbelly.flavorText;  
   this.soldOut = false;
   
-  this.x = (opts.x !== undefined) ? opts.x : ((vpwidth() / 4) - 130);
-  this.y = (opts.y !== undefined) ? opts.y : ((vpheight() / 2) - 200);
-  this.w = (opts.w !== undefined) ? opts.w : (vpwidth() / 2);
+  this.x = (opts.x !== undefined) ? opts.x : ((width / 4) - 130);
+  this.y = (opts.y !== undefined) ? opts.y : ((height / 2) - 200);
+  this.w = (opts.w !== undefined) ? opts.w : (width / 2);
   
   this.fontFamily = "MS Shell DLG, Arial, fantasy";
   this.fillStyle = (opts.fillStyle) ? opts.fillStyle : "#282828";
@@ -369,8 +378,8 @@ function Text (opts) {
   this.isQuitOption = (opts.isQuitOption) ? opts.isQuitOption : false;
   this.isCursorable = (opts.isCursorable !== undefined) ? opts.isCursorable : true;
   
-  this.x = (opts.x) ? opts.x : ((vpwidth() / 2) - 130);
-  this.y = (opts.y) ? opts.y : ((vpheight() / 2) - 200);
+  this.x = (opts.x) ? opts.x : ((width / 2) - 130);
+  this.y = (opts.y) ? opts.y : ((height / 2) - 50);
   
   this.fontFamily = "MS Shell DLG, Arial, fantasy";
   this.fillStyle = (opts.fillStyle) ? opts.fillStyle : "#282828";

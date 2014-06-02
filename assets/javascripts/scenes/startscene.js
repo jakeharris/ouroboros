@@ -1,9 +1,9 @@
 function StartScene() {
   
-  var name = "Start Menu";
+  var name = 'Start';
   var DEFAULT_ENTITIES = [
       new Text({ type: 'Title', text: 'OUROBOROS' }),
-      new Text({ type: 'MenuItem', text: 'Press any key to start', x: vpwidth()/2 - 130, y: vpheight()/2 })
+      new Text({ type: 'MenuItem', text: 'Press any key to start', x: width/2 - 130, y: height/2 })
       /*new Menu([
           new Text({ type: 'MenuItem', text: 'New Game (coming soon!)' }),
           new Text({ type: 'MenuItem', text: 'Continue (coming soon!)', fillStyle: (docCookies.hasItem('save') && docCookies.hasItem('game')) ? '#282828' : '#aaa' }),

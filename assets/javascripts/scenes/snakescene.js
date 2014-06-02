@@ -1,6 +1,6 @@
 function SnakeScene () {
   var name = "Snake";
-  var DEFAULT_ENTITIES = [ new Snake({ size: 20 }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
+  var DEFAULT_ENTITIES = [ new Snake({ size: SNAKE_BASE_SIZE }), new Block ({ moves: false, fillStyle: '#CC3A09' }) ];
   var handleEvent = function (e) {
     var d = scenes[TimeAttackScenes.SNAKE].entities[0].direction,
         key = e.which;
@@ -121,9 +121,9 @@ function SnakeScene () {
            ||
            snakeHead.y < 0
            ||
-           snakeHead.x > vpwidth()/BLOCK_WIDTH - 1
+           snakeHead.x > width/BLOCK_WIDTH - 1
            ||
-           snakeHead.y > vpheight()/BLOCK_WIDTH - 1)
+           snakeHead.y > height/BLOCK_WIDTH - 1)
               return true;
         
         return false;
@@ -205,7 +205,7 @@ function SnakeScene () {
 
 this.respawn = function () {
         if(!this.entities) return false;
-        this.entities[0] = new Snake({ size: 20 });
+        this.entities[0] = new Snake({ size: SNAKE_BASE_SIZE });
         this.entities[1] = new Block({ moves: false, fillStyle: '#CC3A09' });
         if(this.highscore < this.score) { this.highscore = this.score; docCookies.setItem('timeattackscore', this.highscore); }
         this.curscore = 0;
