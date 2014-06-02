@@ -7,7 +7,7 @@ function TimeAttackEndScene (opts) {
                                 new Text( { type: "MenuItem", text: "Retry" } ), 
                                 new Text( { type: "MenuItem", text: "Quit" } )
                               ], 
-                             { x: function () { return width / 2; }, y: height / 2 } ),
+                             { x: width / 2, y: height / 2 } ),
                     new Text( { type: "Subtitle", text: "Score: " + score, y: height/5 })
       ],
       handleEvent = function (e) {

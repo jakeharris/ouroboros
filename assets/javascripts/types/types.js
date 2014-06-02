@@ -254,7 +254,7 @@ function Snake (opts, blockopts) {
 function Menu (items, opts) {
   this.items = items;
   this.spacing = (opts.spacing) ? opts.spacing : height / 10;
-  this.x = (opts.x) ? opts.x : function () { return (width / 2 - 100); };
+  this.x = (opts.x) ? opts.x : width / 2 - 100;
   this.y = (opts.y) ? opts.y : (height - 400);
   this.cursor = new Cursor ( items.length - 1, { h: 16, w: 16 } )
   
@@ -272,9 +272,9 @@ function Menu (items, opts) {
   
   this.render = function () {
     this.spacing = height / 10;
-    this.cursor.render(this.x(), this.items[this.cursor.i].y - this.cursor.h);
+    this.cursor.render(this.x, this.items[this.cursor.i].y - this.cursor.h);
     items.forEach(function (e, i, a) {
-      e.x = this.x();
+      e.x = this.x;
       e.y = this.y;
       if(e.type === "MenuItem") {
         e.x += BLOCK_WIDTH;

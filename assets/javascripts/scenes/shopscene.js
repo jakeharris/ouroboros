@@ -44,7 +44,7 @@ function ShopScene (opts) {
                                   id: Upgrades.Aerobody.id
                                 } ), //segments of unit collision avoidance in the body
                                 new Text( { type: 'MenuItem', text: 'Exit shop', isQuitOption: true } )
-                    ], { x: width / 4,y: height / 5 } ),
+                    ], { x: width / 4, y: height / 5 } ),
                     new Text( { type: 'Subtitle', text: 'Eggs remaining: ' + this.wallet, y: height/10 })
   ];
   var handleEvent = function (e) {
