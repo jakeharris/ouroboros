@@ -40,13 +40,14 @@ function TimeAttackSnakeScene() {
     var minutes = (Math.floor((this.maxTime - this.timePassed) / 60)),
         seconds = ((this.maxTime - this.timePassed) - Math.floor((this.maxTime - this.timePassed) / 60)*60);
     
-    ctx.fillStyle = '#282828';
+    ctx.fillStyle = '#fff';
     ctx.beginPath();
-    ctx.fillText('Total: ' + this.score, width/20, height/20);
-    ctx.fillText('High score: ' + this.highscore, width/20, height/10);
+    ctx.fillText('Total: ' + this.score, width - BLOCK_WIDTH, height/20);
+    ctx.fillText('High score: ' + this.highscore, BLOCK_WIDTH, height/20);
     //ctx.fillText('' + minutes + ':' + ((seconds < 10) ? '0' + seconds : seconds), width/2, height/20);
     ctx.closePath();
     ctx.fill();
+    ctx.fillStyle = '#282828';
   };
   
   this.end = function () {

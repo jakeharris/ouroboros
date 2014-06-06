@@ -68,8 +68,8 @@ Upgrades.Aerobody = {
 
 function Block (opts) {
   
-  this.x = (opts !== undefined && opts.x !== undefined) ? opts.x : Math.floor(Math.random() * Math.floor( width/BLOCK_WIDTH ));
-  this.y = (opts !== undefined && opts.y !== undefined) ? opts.y : Math.floor(Math.random() * Math.floor( height/BLOCK_HEIGHT ));    
+  this.x = (opts !== undefined && opts.x !== undefined) ? opts.x : Math.floor(Math.random() * Math.floor( width/BLOCK_WIDTH - 1 )) + 1;
+  this.y = (opts !== undefined && opts.y !== undefined) ? opts.y : Math.floor(Math.random() * Math.floor( height/BLOCK_HEIGHT - 1 )) + 1;    
   this.width = BLOCK_WIDTH,
   this.height = BLOCK_HEIGHT,
   this.moves = (opts.moves) ? opts.moves : false,
@@ -406,9 +406,11 @@ function Text (opts) {
   }
 }
 
-function StillZone (x, y, opts) {  
+function StillZone (x, y, i, opts) {  
   this.fillStyle = '#44B8FC'; //this is one of the colors in the Magic Man's hatband (Adventure Time)
   this.moves = true;
+  
+  this.i = i; //identifier
   
   this.x = x;
   this.y = y;
@@ -416,11 +418,23 @@ function StillZone (x, y, opts) {
   this.r = (opts.r) ? opts.r : STILLZONE_BASE_RADIUS;
   
   this.alive = true;
+  
   this.destroy = function () {
+    console.log('stillzone is now not alive');
     this.alive = false;
   };
   
-  this.lifetimeID = setInterval(this.destroy, 3000);
+  this.lifetimeID = setInterval(function () { 
+    scenes[cur].entities.some(function (e, i, a) {
+      if(e instanceof StillZone) {
+        if (e.alive) {
+          e.alive = false; 
+          return true;
+        }
+        return false;
+      }
+    })
+  }, 3000);
   
   this.move = function () {
      if(this.r < STILLZONE_BASE_RADIUS*BLOCK_WIDTH) this.r++;

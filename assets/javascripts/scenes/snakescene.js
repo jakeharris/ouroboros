@@ -45,9 +45,7 @@ function SnakeScene () {
         if(this.entities.length > 2) this.stillair();
         else if (this.inStillAir) {
             this.inStillAir = false;
-            clearInterval(this.slowTimeLooper);
             this.slowTimeLooper = null;
-            this.arcadeTimeLooper = setInterval(this.timerHandler, 1000);
         }
     
         if(this.score >= this.maxScore) {
@@ -117,13 +115,13 @@ function SnakeScene () {
         if(!this.entities) return false;
         if(!(snakeHead = this.entities[0].blocks[0]))return false;
         
-        if(snakeHead.x < 0
+        if(snakeHead.x < 1
            ||
-           snakeHead.y < 0
+           snakeHead.y < 1
            ||
-           snakeHead.x > width/BLOCK_WIDTH - 1
+           snakeHead.x > width/BLOCK_WIDTH 
            ||
-           snakeHead.y > height/BLOCK_WIDTH - 1)
+           snakeHead.y > height/BLOCK_WIDTH)
               return true;
         
         return false;
@@ -262,7 +260,7 @@ this.growSnake = function () {
         if(!this.entities[1]) return false;
     
         upgrades.splice(upgrades.indexOf(Upgrades.StillAir), 1);
-        this.entities.push(new StillZone(this.entities[0].blocks[0].x, this.entities[0].blocks[0].y, { }))
+        this.entities.push(new StillZone(this.entities[0].blocks[0].x + 1 / 2, this.entities[0].blocks[0].y + 1 / 2, this.entities.length, { }))
   };
   
   this.aerobody = function () {
@@ -280,19 +278,25 @@ this.growSnake = function () {
 
   this.isSlowMo = function () {
     var entitiesToRemove = [];
+    
+    
     for(var i = 0; i < this.entities.length; i++) {
       if(this.entities[i].hasOwnProperty('alive')) {
+        
         if (!this.entities[i].alive) { entitiesToRemove.push(i); }
         
         var e = this.entities[i],
             a = this.entities;
-        
-        this.inStillAir = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < Math.sqrt(e.r / BLOCK_WIDTH));
+        //FIXME
+        this.inStillAir = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < (e.r / BLOCK_WIDTH));
       }
     }
+    
     for(var i = entitiesToRemove.length - 1; i >= 0; i--) {
+      clearInterval(this.entities[entitiesToRemove[i]].lifetimeID);
       this.entities.splice(entitiesToRemove[i], 1);
     }
+    
   };    
   this.slowMoTimerSetup = function () {
     if(this.inStillAir && this.arcadeTimeLooper != null) { 

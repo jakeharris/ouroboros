@@ -13,16 +13,17 @@ var width = vpwidth(),
     game,
     inputs = [],
     paused = false,
+    destroyStillAirsThroughIndex = 0,
     upgrades = [];
 
 ctx.font = "22pt Cascada";
 
 var clear = function () {
         var dim = setGameDimensions(vpwidth(), vpheight(), BLOCK_WIDTH, BLOCK_HEIGHT);
-        width = dim.width;
-        height = dim.height;
         BLOCK_WIDTH = dim.block_width;
         BLOCK_HEIGHT = dim.block_height;
+        width = dim.width - 2 * BLOCK_WIDTH;
+        height = dim.height - 2 * BLOCK_HEIGHT;
   
         if(c.width != vpwidth() || c.height != vpheight()) {
           c.width = vpwidth();
@@ -37,7 +38,7 @@ var clear = function () {
   
         ctx.fillStyle = '#fff';
         ctx.beginPath();
-        ctx.rect(0, 0, width, height);
+        ctx.rect(BLOCK_WIDTH, BLOCK_HEIGHT, width, height);
         ctx.closePath();
         ctx.fill();
         /*if(cur === TimeAttackScenes.SNAKE) {

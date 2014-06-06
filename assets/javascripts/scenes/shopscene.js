@@ -91,9 +91,9 @@ function ShopScene (opts) {
       this.entities[2].text = 'Eggs remaining: ' + this.wallet;
       this.walletUpdated = false;
     }
-    this.entities[0].x = width / 2 - 100;
-    this.entities[1].x = width / 2 - 100;
-    this.entities[2].x = width / 2 - 100;
+    this.entities[0].x = width / 2 - 100 + BLOCK_WIDTH;
+    this.entities[1].x = width / 2 - 100 + BLOCK_WIDTH;
+    this.entities[2].x = width / 2 - 100 + BLOCK_WIDTH;
     return this.move();
   };
   

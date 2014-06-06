@@ -2,13 +2,13 @@ function TimeAttackEndScene (opts) {
   var score = 0,
       name = "Game Over",
       DEFAULT_ENTITIES = [ 
-                    new Text( { type: "Title", text: name, y: height/10 } ),
+                    new Text( { type: "Title", text: name, y: height/10 + BLOCK_HEIGHT } ),
                     new Menu( [
                                 new Text( { type: "MenuItem", text: "Retry" } ), 
                                 new Text( { type: "MenuItem", text: "Quit" } )
                               ], 
-                             { x: width / 2, y: height / 2 } ),
-                    new Text( { type: "Subtitle", text: "Score: " + score, y: height/5 })
+                             { x: width / 2, y: height / 2 + BLOCK_HEIGHT } ),
+                    new Text( { type: "Subtitle", text: "Score: " + score, y: height/5 + BLOCK_HEIGHT })
       ],
       handleEvent = function (e) {
         var d,
