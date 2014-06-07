@@ -18,9 +18,15 @@ function TimeAttackSnakeScene() {
     console.log(this.name + ' scene is starting...');
     document.addEventListener('keydown', this.handleEvent);
     this.initialized = true;
+    console.log('I\'m initializing!');
+    this.shopTimer = setTimeout(this.setUpShop(), 1000);
     //this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); 
     if(docCookies.hasItem('timeattackscore')) this.highscore = docCookies.getItem('timeattackscore');
   };
+  
+  this.test = function () {
+    upgrades.push(Upgrades.GoldenPlumes); 
+  }
   
   this.render = function () {
     if(!this.entities) return;
@@ -49,6 +55,20 @@ function TimeAttackSnakeScene() {
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle = '#282828';
+    
+    
+    if(this.shop.x !== undefined && this.shop.y !== undefined) {
+      ctx.beginPath();
+      ctx.fillStyle = '#ffe584';
+      if(this.shop.horizontal) {
+        ctx.fillRect(this.shop.x * BLOCK_WIDTH, this.shop.y * BLOCK_HEIGHT, 3 * BLOCK_WIDTH, BLOCK_HEIGHT); 
+      } else {
+        ctx.fillRect(this.shop.x * BLOCK_WIDTH, this.shop.y * BLOCK_HEIGHT, BLOCK_WIDTH, 3 * BLOCK_HEIGHT); 
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#282828';
+    }
   };
   
   this.end = function () {
@@ -68,6 +88,7 @@ function TimeAttackSnakeScene() {
     cur = TimeAttackScenes.SHOP;
   }; 
   this.unpause = function () {
+    console.log(this.name + ' scene is unpausing...');
     document.addEventListener('keydown', this.handleEvent);
     this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); 
   }

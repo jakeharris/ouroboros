@@ -29,6 +29,12 @@ function SnakeScene () {
   this.inStillAir = false;
   this.arcadeTimerLooper = 0;
   this.slowTimeLooper = null;
+  this.shopTimer = null;
+  this.shop = {
+    x: 0,
+    y: 0,
+    horizontal: false
+  }
 /* =================
  * SNAKE - OVERRIDES
  * =================
@@ -36,9 +42,7 @@ function SnakeScene () {
    Overrides of Scene class functions.
  
  */
-  this.test = function () {
-    upgrades.push(Upgrades.GoldenPlumes); 
-  }
+  
   this.logic = function () {
         if(!this.initialized) this.init();
         if(!this.entities) this.entities = cloneArray(DEFAULT_ENTITIES);
@@ -54,15 +58,21 @@ function SnakeScene () {
           this.score = this.maxScore; //just in case someone cheated!
           return this.end();
         }
+    
         if(this.atWorldsEnd()) {
-          if(hasUpgrade(Upgrades.GoldenPlumes)) return this.move();
-          this.respawn();
-          this.end();
-          cur = TimeAttackScenes.GAMEOVER;
+          if(this.atShopEntrance()) return this.enterShop();
+          else if(hasUpgrade(Upgrades.GoldenPlumes)) return this.move();
+          else {
+            this.respawn();
+            this.end();
+            cur = TimeAttackScenes.GAMEOVER;
+          }
         }
-        if(this.bitingSelf()) { this.respawn(); this.end(); cur = TimeAttackScenes.GAMEOVER; }
+    
+        if(this.bitingSelf()) { console.log('BITING SELF IS MUCH PROBLEM'); this.respawn(); this.end(); cur = TimeAttackScenes.GAMEOVER; }
         if(this.eatingEgg()) return this.eatEgg();
         if(this.name === 'Time Attack - Snake' && this.timeIsUp()) return this.end();
+    
         return this.move();
   };
   this.render = function () {
@@ -80,6 +90,7 @@ function SnakeScene () {
         /* Draw the snake, then the egg, so the egg is always visible, and the snake is always visible above the still airs. */
         this.entities[0].render();
         this.entities[1].render();
+    
   };
   this.move = function () {
       if (!this.entities) throw new EntityInitializationException(this.name + ': move() function didn\'t get an entity set.');
@@ -100,7 +111,39 @@ function SnakeScene () {
     cur = TimeAttackScenes.SHOP;
   }; 
   this.unpause = function () {
+    console.log(this.name + ' scene is unpausing...');
     document.addEventListener('keydown', this.handleEvent);
+  }
+  this.setUpShop = function () {
+    var side = Math.floor(Math.random() * 4)
+        //TOP, RIGHT, BOTTOM, LEFT : 0, 1, 2, 3
+        switch(side){
+          case 0:
+            this.shop.x = Math.floor(Math.random() * (width/BLOCK_WIDTH - 5 + 1)) + 2;
+            this.shop.y = 0;
+            this.shop.horizontal = true;
+            return true;
+          case 1:
+            this.shop.x = width/BLOCK_WIDTH + 1;
+            this.shop.y = Math.floor(Math.random() * (height/BLOCK_WIDTH - 5 + 1)) + 2;
+            this.shop.horizontal = false;
+            return true;
+          case 2:
+            this.shop.x = Math.floor(Math.random() * (width/BLOCK_WIDTH - 5 + 1)) + 2;
+            this.shop.y = height/BLOCK_WIDTH + 1;
+            this.shop.horizontal = true;
+            return true;
+          case 3:
+            this.shop.x = 0;
+            this.shop.y = Math.floor(Math.random() * (height/BLOCK_WIDTH - 5 + 1)) + 2;
+            this.shop.horizontal = false;
+            return true;
+          default:
+            this.shop.x = 0; this.shop.y = 0; this.shop.horizontal = false;
+            console.log('Error setting up shop (snakescene.js, 135). Value of side: ' + side);
+            return false;
+        }
+    return false;
   }
   
 /* ==============
@@ -115,8 +158,9 @@ function SnakeScene () {
         var snakeHead;
         
         if(!this.entities) return false;
+        if(this.entities == undefined) return false;
         if(!(snakeHead = this.entities[0].blocks[0]))return false;
-        
+          
         if(snakeHead.x < 1
            ||
            snakeHead.y < 1
@@ -128,7 +172,27 @@ function SnakeScene () {
         
         return false;
       };
-                       
+  this.atShopEntrance = function () {
+        var snakeHead;
+        
+        if(!this.entities) return false;
+        if(this.entities == undefined) return false;
+        if(!(snakeHead = this.entities[0].blocks[0]))return false;
+    
+        if(this.shop.horizontal
+        && snakeHead.x     <= this.shop.x
+        && snakeHead.x + 2 >= this.shop.x
+        && snakeHead.y     == this.shop.y) return true;
+    
+        else if(!this.shop.horizontal
+        && snakeHead.y     <= this.shop.y
+        && snakeHead.y + 2 >= this.shop.y
+        && snakeHead.x     == this.shop.x) return true;
+    
+        else return false;
+        
+           
+  };
   this.bitingSelf = function () {
         if(!this.entities) return false;
         if(!this.entities[0].blocks[0]) return false;
@@ -189,7 +253,7 @@ function SnakeScene () {
         return false;
       };
   this.timeIsUp = function () {
-    return false; 
+        return false; 
   }
 
 /* ===============
@@ -256,6 +320,33 @@ this.growSnake = function () {
         this.entities[0].blocks = snakeBlocks;
       };
   
+  this.enterShop = function () {
+        if(paused) pause();
+        scenes[TimeAttackScenes.SNAKE].pause();
+        cur = TimeAttackScenes.SHOP;
+  };
+  this.exitShop = function () {
+        var tx = (this.shop.horizontal || this.shop.x == 0) ?
+                  this.shop.x + 1
+                : this.shop.x - 1
+          , ty = (!this.shop.horizontal || this.shop.y == 0) ?
+                  this.shop.y + 1
+                : this.shop.y - 1;
+    
+    
+        this.entities[0] = new Snake ( 
+          { 
+            speed: SNAKE_BASE_LOOPS_TO_MOVE * (0.95^this.score)
+          , size: SNAKE_BASE_SIZE + this.score 
+          },
+          {
+            x: tx,
+            y: ty,
+            direction: getDirectionFromWallProximity(new Block( { x: tx, y: ty })) 
+          }
+        );
+  };
+  
   this.spawnStillZone = function () {
         if(!this.entities) return false;
         if(!this.entities[0]) return false;
@@ -266,56 +357,56 @@ this.growSnake = function () {
   };
   
   this.aerobody = function () {
-   this.entities[0].blocks.forEach(function (e, i, a) {
-     if(i > (this.entities[0].blocks.length - 1)/4 && i < (this.entities[0].blocks.length - 1)*3/4)
-       e.isTransparent = true;
-     else e.isTransparent = false;
-   }, this);
+       this.entities[0].blocks.forEach(function (e, i, a) {
+         if(i > (this.entities[0].blocks.length - 1)/4 && i < (this.entities[0].blocks.length - 1)*3/4)
+           e.isTransparent = true;
+         else e.isTransparent = false;
+       }, this);
   };
   
   this.stillair = function () {
-    this.isSlowMo();
-    this.slowMoTimerSetup();
+        this.isSlowMo();
+        this.slowMoTimerSetup();
   };
 
   this.isSlowMo = function () {
-    var entitiesToRemove = [];
-    
-    
-    for(var i = 0; i < this.entities.length; i++) {
-      if(this.entities[i].hasOwnProperty('alive')) {
-        
-        if (!this.entities[i].alive) { entitiesToRemove.push(i); }
-        
-        var e = this.entities[i],
-            a = this.entities;
-        //FIXME
-        this.inStillAir = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < (e.r / BLOCK_WIDTH));
-      }
-    }
-    
-    for(var i = entitiesToRemove.length - 1; i >= 0; i--) {
-      clearInterval(this.entities[entitiesToRemove[i]].lifetimeID);
-      this.entities.splice(entitiesToRemove[i], 1);
-    }
-    
+        var entitiesToRemove = [];
+
+
+        for(var i = 0; i < this.entities.length; i++) {
+          if(this.entities[i].hasOwnProperty('alive')) {
+
+            if (!this.entities[i].alive) { entitiesToRemove.push(i); }
+
+            var e = this.entities[i],
+                a = this.entities;
+            //FIXME
+            this.inStillAir = (Math.sqrt(Math.pow(e.x - a[0].blocks[0].x, 2) + Math.pow(e.y - a[0].blocks[0].y, 2)) < (e.r / BLOCK_WIDTH));
+          }
+        }
+
+        for(var i = entitiesToRemove.length - 1; i >= 0; i--) {
+          clearInterval(this.entities[entitiesToRemove[i]].lifetimeID);
+          this.entities.splice(entitiesToRemove[i], 1);
+        }
+
   };    
   this.slowMoTimerSetup = function () {
-    if(this.inStillAir && this.arcadeTimeLooper != null) { 
-      if(this.name === 'Time Attack - Snake') { // not sure if want
-        clearInterval(this.arcadeTimeLooper); 
-        this.arcadeTimeLooper = null
-        this.slowTimeLooper = setInterval(this.timerHandler, 3000);
-        this.timerHandler();
-      }
-    }
-    else if (!this.inStillAir && this.arcadeTimeLooper == null) { 
-      if(this.name === 'Time Attack - Snake') {
-        clearInterval(this.slowTimeLooper);
-        this.slowTimeLooper = null;
-        this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); 
-      }
-    }
+        if(this.inStillAir && this.arcadeTimeLooper != null) { 
+          if(this.name === 'Time Attack - Snake') { // not sure if want
+            clearInterval(this.arcadeTimeLooper); 
+            this.arcadeTimeLooper = null
+            this.slowTimeLooper = setInterval(this.timerHandler, 3000);
+            this.timerHandler();
+          }
+        }
+        else if (!this.inStillAir && this.arcadeTimeLooper == null) { 
+          if(this.name === 'Time Attack - Snake') {
+            clearInterval(this.slowTimeLooper);
+            this.slowTimeLooper = null;
+            this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); 
+          }
+        }
   };
 }
 /* ARCADE MODE STUFF - SNAKESCENE

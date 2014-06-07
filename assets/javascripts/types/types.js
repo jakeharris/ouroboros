@@ -190,6 +190,14 @@ function Snake (opts, blockopts) {
           this.tail.x = this.blocks[0].x; this.tail.y = this.blocks[0].y; this.tail.direction = this.blocks[0].direction;
           if(inputs.length > 0) {
             var i = inputs.pop();
+            while(i !== undefined && 
+               (i == this.direction 
+                || (i == Direction.LEFT && this.direction == Direction.RIGHT)
+                || (i == Direction.UP && this.direction == Direction.DOWN)
+                || (i == Direction.RIGHT && this.direction == Direction.LEFT)
+                || (i == Direction.DOWN && this.direction == Direction.UP))) {
+              i = inputs.pop();
+            }
             this.direction = (i !== undefined) ? i : this.direction;
           }
           this.preventOuroboros();
