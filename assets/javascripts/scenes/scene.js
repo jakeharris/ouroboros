@@ -32,6 +32,10 @@ function Scene(name, DEFAULT_ENTITIES, handleEvent) {
     console.log(name + ' scene is starting...');
     document.addEventListener('keydown', this.handleEvent);
     this.initialized = true;
+    return this.test();
+  };
+  this.test = function () {
+    
   };
   this.logic = function () {
     if(!this.initialized) this.init();

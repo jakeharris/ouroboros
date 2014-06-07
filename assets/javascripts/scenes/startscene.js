@@ -2,9 +2,12 @@ function StartScene() {
   
   var name = 'Start';
   var DEFAULT_ENTITIES = [
-      new Text({ type: 'Title', text: 'OUROBOROS', x: width/2 - 130 + BLOCK_WIDTH }),
-      new Text({ type: 'MenuItem', text: 'Press any key to start', x: width/2 - 130 + BLOCK_WIDTH, y: height/2 + BLOCK_HEIGHT })
-      /*new Menu([
+      new Text({ type: 'Title', text: 'OUROBOROS' }),
+      new Text({ type: 'MenuItem', text: 'Press any key to start', y: height/2 + BLOCK_HEIGHT})
+      /*
+      x: width/2 - 130 + BLOCK_WIDTH
+      , x: width/2 - 130 + BLOCK_WIDTH, y: height/2 + BLOCK_HEIGHT 
+      new Menu([
           new Text({ type: 'MenuItem', text: 'New Game (coming soon!)' }),
           new Text({ type: 'MenuItem', text: 'Continue (coming soon!)', fillStyle: (docCookies.hasItem('save') && docCookies.hasItem('game')) ? '#282828' : '#aaa' }),
           new Text({ type: 'MenuItem', text: 'Time Attack' })

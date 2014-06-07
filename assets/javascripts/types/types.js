@@ -98,15 +98,15 @@ function Block (opts) {
       default:
         return false;
     }
-    if(hasUpgrade(Upgrades.GoldenPlumes) && (this.x < 0 || this.x > width/BLOCK_WIDTH - 1 || this.y < 0 || this.y > height/BLOCK_WIDTH - 1)) {
-      if(this.x < 0) {
-        this.x = width/BLOCK_WIDTH - 1; 
-      } else if (this.x > width / BLOCK_WIDTH - 1) {
-        this.x = 0; 
-      } else if (this.y < 0) {
-          this.y = Math.floor(height / BLOCK_WIDTH) - 1;
-      } else if (this.y > height/BLOCK_WIDTH - 1) {
-        this.y = 0; 
+    if(hasUpgrade(Upgrades.GoldenPlumes) && (this.x < 1 || this.x > width/BLOCK_WIDTH || this.y < 1 || this.y > height/BLOCK_WIDTH)) {
+      if(this.x < 1) {
+        this.x = width/BLOCK_WIDTH; 
+      } else if (this.x > width / BLOCK_WIDTH) {
+        this.x = 1; 
+      } else if (this.y < 1) {
+          this.y = Math.floor(height / BLOCK_WIDTH);
+      } else if (this.y > height/BLOCK_WIDTH) {
+        this.y = 1; 
       }
     }
   };
@@ -378,8 +378,8 @@ function Text (opts) {
   this.isQuitOption = (opts.isQuitOption) ? opts.isQuitOption : false;
   this.isCursorable = (opts.isCursorable !== undefined) ? opts.isCursorable : true;
   
-  this.x = (opts.x) ? opts.x : ((width / 2) - 130);
-  this.y = (opts.y) ? opts.y : ((height / 2) - 50);
+  this.x = (opts.x) ? opts.x : (width / 2);
+  this.y = (opts.y) ? opts.y : (height / 2);
   
   this.fontFamily = "MS Shell DLG, Arial, fantasy";
   this.fillStyle = (opts.fillStyle) ? opts.fillStyle : "#282828";

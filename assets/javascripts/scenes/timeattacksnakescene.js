@@ -42,6 +42,7 @@ function TimeAttackSnakeScene() {
     
     ctx.fillStyle = '#fff';
     ctx.beginPath();
+    ctx.textAlign = 'left';
     ctx.fillText('Total: ' + this.score, width - BLOCK_WIDTH, height/20);
     ctx.fillText('High score: ' + this.highscore, BLOCK_WIDTH, height/20);
     //ctx.fillText('' + minutes + ':' + ((seconds < 10) ? '0' + seconds : seconds), width/2, height/20);

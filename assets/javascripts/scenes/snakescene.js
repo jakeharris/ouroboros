@@ -36,7 +36,9 @@ function SnakeScene () {
    Overrides of Scene class functions.
  
  */
-  
+  this.test = function () {
+    upgrades.push(Upgrades.GoldenPlumes); 
+  }
   this.logic = function () {
         if(!this.initialized) this.init();
         if(!this.entities) this.entities = cloneArray(DEFAULT_ENTITIES);

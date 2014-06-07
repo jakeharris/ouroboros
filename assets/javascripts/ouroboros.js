@@ -31,6 +31,7 @@ var clear = function () {
         }
   
         ctx.fillstyle = '#282828';
+        ctx.textAlign = 'center';
         ctx.beginPath();
         ctx.rect(0, 0, vpwidth(), vpheight());
         ctx.closePath();
