@@ -63,8 +63,8 @@ function SnakeScene () {
           if(this.atShopEntrance()) return this.enterShop();
           else if(hasUpgrade(Upgrades.GoldenPlumes)) return this.move();
           else {
-            this.respawn();
             this.end();
+            this.respawn();
             cur = TimeAttackScenes.GAMEOVER;
           }
         }
@@ -180,13 +180,13 @@ function SnakeScene () {
         if(!(snakeHead = this.entities[0].blocks[0]))return false;
     
         if(this.shop.horizontal
-        && snakeHead.x     <= this.shop.x
-        && snakeHead.x + 2 >= this.shop.x
+        && snakeHead.x     >= this.shop.x
+        && snakeHead.x - 2 <= this.shop.x
         && snakeHead.y     == this.shop.y) return true;
     
         else if(!this.shop.horizontal
-        && snakeHead.y     <= this.shop.y
-        && snakeHead.y + 2 >= this.shop.y
+        && snakeHead.y     >= this.shop.y
+        && snakeHead.y - 2 <= this.shop.y
         && snakeHead.x     == this.shop.x) return true;
     
         else return false;
@@ -235,7 +235,10 @@ function SnakeScene () {
         this.entities[0].blocks.some(function (e, i, a) {
           if(!head) { head = e; }
           else if(e.hasOwnProperty('isTransparent') && e.isTransparent) { }
-          else if(Math.sqrt(Math.pow(head.x - e.x, 2) + Math.pow(head.y - e.y, 2)) < 1) return (ret = true);
+          else if(head.x == e.x && head.y == e.y) {
+            console.log('WHOA');
+            return (ret = true);
+          }
         });
     
         return ret;
@@ -331,18 +334,20 @@ this.growSnake = function () {
                 : this.shop.x - 1
           , ty = (!this.shop.horizontal || this.shop.y == 0) ?
                   this.shop.y + 1
-                : this.shop.y - 1;
+                : this.shop.y - 1
+          , score = this.score;
     
     
         this.entities[0] = new Snake ( 
           { 
-            speed: SNAKE_BASE_LOOPS_TO_MOVE * (0.95^this.score)
-          , size: SNAKE_BASE_SIZE + this.score 
+            loops: SNAKE_BASE_LOOPS_TO_MOVE * Math.pow(0.95, score)
+          , size: SNAKE_BASE_SIZE + score 
           },
           {
-            x: tx,
-            y: ty,
-            direction: getDirectionFromWallProximity(new Block( { x: tx, y: ty })) 
+            x: tx
+          , y: ty
+          , direction: getDirectionFromWallProximity(new Block( { x: tx, y: ty })) 
+          , moves: true
           }
         );
   };
