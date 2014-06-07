@@ -10,11 +10,6 @@ function SnakeScene () {
     else if (key == '39' && d != Direction.LEFT)  d = Direction.RIGHT;
     else if (key == '40' && d != Direction.UP)    d = Direction.DOWN;
     else if (key == '32' && hasUpgrade(Upgrades.StillAir)) scenes[TimeAttackScenes.SNAKE].spawnStillZone(); 
-    else if (key == '17') {
-      if(paused) pause();
-      scenes[TimeAttackScenes.SNAKE].pause();
-      cur = TimeAttackScenes.SHOP;
-    }
     else if (key == '27' || key == '80') pause();
     else if (key == '81' && paused) {
       scenes[TimeAttackScenes.SNAKE].end();
@@ -31,8 +26,8 @@ function SnakeScene () {
   this.slowTimeLooper = null;
   this.shopTimer = null;
   this.shop = {
-    x: 0,
-    y: 0,
+    x: undefined,
+    y: undefined,
     horizontal: false
   }
 /* =================
@@ -115,35 +110,38 @@ function SnakeScene () {
     document.addEventListener('keydown', this.handleEvent);
   }
   this.setUpShop = function () {
-    var side = Math.floor(Math.random() * 4)
-        //TOP, RIGHT, BOTTOM, LEFT : 0, 1, 2, 3
-        switch(side){
-          case 0:
-            this.shop.x = Math.floor(Math.random() * (width/BLOCK_WIDTH - 5 + 1)) + 2;
-            this.shop.y = 0;
-            this.shop.horizontal = true;
-            return true;
-          case 1:
-            this.shop.x = width/BLOCK_WIDTH + 1;
-            this.shop.y = Math.floor(Math.random() * (height/BLOCK_WIDTH - 5 + 1)) + 2;
-            this.shop.horizontal = false;
-            return true;
-          case 2:
-            this.shop.x = Math.floor(Math.random() * (width/BLOCK_WIDTH - 5 + 1)) + 2;
-            this.shop.y = height/BLOCK_WIDTH + 1;
-            this.shop.horizontal = true;
-            return true;
-          case 3:
-            this.shop.x = 0;
-            this.shop.y = Math.floor(Math.random() * (height/BLOCK_WIDTH - 5 + 1)) + 2;
-            this.shop.horizontal = false;
-            return true;
-          default:
-            this.shop.x = 0; this.shop.y = 0; this.shop.horizontal = false;
-            console.log('Error setting up shop (snakescene.js, 135). Value of side: ' + side);
-            return false;
-        }
+    var side = Math.floor(Math.random() * 4);
+    //TOP, RIGHT, BOTTOM, LEFT : 0, 1, 2, 3
+    switch(side){
+      case 0:
+        scenes[cur].shop.x = Math.floor(Math.random() * (width/BLOCK_WIDTH - 5 + 1)) + 2;
+        scenes[cur].shop.y = 0;
+        scenes[cur].shop.horizontal = true;
+        return true;
+      case 1:
+        scenes[cur].shop.x = width/BLOCK_WIDTH + 1;
+        scenes[cur].shop.y = Math.floor(Math.random() * (height/BLOCK_WIDTH - 5 + 1)) + 2;
+        scenes[cur].shop.horizontal = false;
+        return true;
+      case 2:
+        scenes[cur].shop.x = Math.floor(Math.random() * (width/BLOCK_WIDTH - 5 + 1)) + 2;
+        scenes[cur].shop.y = height/BLOCK_WIDTH + 1;
+        scenes[cur].shop.horizontal = true;
+        return true;
+      case 3:
+        scenes[cur].shop.x = 0;
+        scenes[cur].shop.y = Math.floor(Math.random() * (height/BLOCK_WIDTH - 5 + 1)) + 2;
+        scenes[cur].shop.horizontal = false;
+        return true;
+      default:
+        scenes[cur].shop.x = 0; this.shop.y = 0; this.shop.horizontal = false;
+        console.log('Error setting up shop (snakescene.js, 135). Value of side: ' + side);
+        return false;
+    }
     return false;
+  };
+  this.takeDownShop = function () {
+     scenes[cur].shop.x = scenes[cur].shop.y = undefined;
   }
   
 /* ==============
@@ -236,7 +234,6 @@ function SnakeScene () {
           if(!head) { head = e; }
           else if(e.hasOwnProperty('isTransparent') && e.isTransparent) { }
           else if(head.x == e.x && head.y == e.y) {
-            console.log('WHOA');
             return (ret = true);
           }
         });
@@ -350,6 +347,8 @@ this.growSnake = function () {
           , moves: true
           }
         );
+        setTimeout(this.takeDownShop, 1000);
+        setTimeout(this.setUpShop, 11000);
   };
   
   this.spawnStillZone = function () {

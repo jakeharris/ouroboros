@@ -19,7 +19,7 @@ function TimeAttackSnakeScene() {
     document.addEventListener('keydown', this.handleEvent);
     this.initialized = true;
     console.log('I\'m initializing!');
-    this.shopTimer = setTimeout(this.setUpShop(), 1000);
+    this.shopTimer = window.setTimeout(this.setUpShop, 5000);
     //this.arcadeTimeLooper = setInterval(this.timerHandler, 1000); 
     if(docCookies.hasItem('timeattackscore')) this.highscore = docCookies.getItem('timeattackscore');
   };
